@@ -1,0 +1,457 @@
+\documentclass[../root.tex]{subfiles}
+
+\begin{document}
+\chapter{Background}
+
+\section{Notation}
+    For a function $f(x,u)$, we define $f_x \equiv \pdv*{f(x,u)}{x}|_{x_k,u_k}$, 
+    $f_{xx} \equiv \pdv*[2]{f(x,u)}{x}|_{x_k,u_k}$, and
+    $f_{xu} \equiv \pdv*{f(x,u)}{x}{u}|_{x_k,u_k}$. We 
+    define a vertical concatenation, $(A,B,C) \equiv [A^T B^T C^T]^T$.
+    The set of natural numbers from one to a positive integer $p$ is denoted 
+    $\mathbb{N}_p \equiv \{1,\dots,p\}$. Let $\zeros_n \in \R^n$ be the zeros 
+    vector of length $n$ and $I_n \in \R^{n \times n}$ be the $n$-by-$n$ 
+    identity matrix.
+
+\section{Trajectory Optimization}
+So far we have discussed methods for solving trajectory optimization problems
+without formally defining the trajectory optimization problem. While
+trajectory optimization problems can take a variety of forms, in robotics we
+often deal with problems of the following form:
+
+\begin{mini}[2] 
+	{x(t),u(t)}{\ell(x(t_f)) + \int_0^{t_f} \ell(x(t),u(t)) dt }{}{} 
+	\addConstraint{\dot{x} = f(x,u)} 
+	\addConstraint{x(0)}{=x_\text{init}}
+	\addConstraint{g(x(t),u(t))}{=0} 
+	\addConstraint{h(x(t),u(t))}{\leq0}
+\label{opt:trajopt}, \end{mini} 
+where $x(t)$ and $u(t)$ are the state and control trajectories from time $0$
+to $t_f$, respectively. Unlike most optimization problems,
+\eqref{opt:trajopt} is an infinite-dimensional nonlinear optimization
+problem, since the optimization variables $x(t)$ and $u(t)$ are arbitrary
+continuous-time trajectories. Adding further complexity, the dynamics
+constraint $\dot{x} = f(x,u)$ constrains the derivatives of the optimization
+variables, implying the need to solve differential equations.
+
+Rather than attempting to solve \eqref{opt:trajopt} by deriving the
+analytical necessary conditions for optimality in continuous time (i.e. an
+``indirect'' method), nearly all modern practitioners first discretize it,
+converting it into a finite-dimensional problem optimizing a discrete set of
+samples along the continuous state and control trajectories (i.e. a
+``direct'' method). 
+The resulting finite-dimensional optimization problem takes the following form:
+\begin{mini}[2]
+	{x_{1:N},u_{1:N-1}}{\ell_N(x_N) + \sum_{k=1}^{N-1} \ell_k(x_k,u_k,\Delta t) }{}{}
+	\addConstraint{x_1 = x_\text{init}}
+	\addConstraint{f(x_{k+1}, u_{k+1}, x_k, u_k,\Delta t) = 0,\; k \in \mathbb{Z}^+_{N-1}}
+	\addConstraint{g_k(x_k,u_k)}{=0,\; k \in \mathbb{N}_N }
+	\addConstraint{h_k(x_k,u_k)}{\leq0,\; k \in \mathbb{N}_N }
+	\label{opt:discrete_trajopt},
+\end{mini}
+where $x_k \in \R^{n}$ and $u_k \in \R^{m}$ are the state and control variables
+at time step $k$, $N$ is the number of time steps (a.k.a ``knot points''),
+$\Delta t_k \equiv t_{k+1} - t_k$ is the time steps, and $\mathbb{N}_k \equiv 
+\{1,2,\dots,k\}$. Overloading notation, here $f$ represents the discretized
+dynamics, potentially using either explicit or implicit integration methods,
+while $\ell_k$ is an approximation of the integrated ``stage'' cost in
+\eqref{opt:discrete_trajopt}. All of the functions $\ell_k$, $\ell_N$, $f$,
+$g_k$ and $h_k$ are assumed to be nonlinear and have continuous
+second-derivatives, unless specified otherwise.
+
+Moving forward, ``trajectory optimization problem'' will refer to a finite-dimensional
+nonlinear optimization problem of the form \eqref{opt:discrete_trajopt}.
+
+\section{The Linear Quadratic Regulator}
+    The Linear Quadratic Regular (LQR) problem is a canonical problem in the
+    theory of optimal control, partially due to the fact that it has analytical
+    solutions that can be derived using a variety of methods, and from the fact
+    that LQR is an extremely useful tool in practice. We present derivations for
+    both continuous-time and discrete-time LQR. The ideas and concepts from these
+    derivations will appear frequently throughout the rest of this work.
+
+    The continuous-time LQR problem is formulated as
+    \begin{mini}[2]
+        {u(t)}{\frac{1}{2}x^T(t_f) Q(t_f) x(t_f) + 
+            \frac{1}{2}\int_0^{t_f} \left(x^T(t) Q(t) x(t) + u^T(t) R(t) u(t) \right) dt}{}{}
+        \addConstraint{\dot{x}(t)}{= A(t)x(t) + B(t)u(t)}
+    \end{mini}
+    where $R$ is a real, symmetric, positive-definite matrix and $Q$ is a real,
+    symmetric, positive semi-definite matrix.
+
+    Using equivalent methods to those used to transform \eqref{opt:trajopt} into \eqref{opt:discrete_trajopt},
+    the discrete-time LQR problem can be written:
+    \begin{mini}|s|
+        {u(t)}{\frac{1}{2}x^T_N Q_N x_N + 
+            \frac{1}{2}\sum_{k=0}^{N-1} x_k^T Q_k x_k + u_k^T R_k u_k }{}{}
+        \addConstraint{x_{k+1}}{= A_k x_k + B_k u_k}
+        \label{opt:discrete_LQR}
+    \end{mini} 
+
+    \subsection{The Hamilton-Jacobian-Bellman Equation}
+        The Hamilton-Jacobi-Bellman equation is an important equation in
+        optimal control theory that states the necessary conditions for
+        optimality for a continuous-time system. We define the cost function
+        to be
+        \begin{equation}
+            J(x(t),u(t),t) = \ell(x(t_f),t) + \int_0^{t_f} \ell(x(t),u(t),t) dt
+        \end{equation}
+        and the cost-to go: 
+        \begin{equation}
+            J^*(x(t),t) = \min_{u(t)} J(x(t),u(t),t) .
+        \end{equation}
+        We now define the Hamiltonian as 
+        \begin{equation}
+            \mathcal{H}(x(t),u(t),J_x^*,t) = \;\ell(x(t),u(t),t)
+                + J_x^{*T}(x(t),t)[f(x(t),u(t),t]
+        \end{equation}
+        where $J_x^* = \pdv{J^*}{x}$ and $f(x(t),u(t),t)$ are the dynamics.  
+
+        The Hamilton-Jacobi-Bellman equation is then
+        \begin{equation} \label{eq:HJB}
+            0 = J_t^*(x(t),t) + \mathcal{H}(x(t),u^*(t),J_x^*,t)
+        \end{equation}
+
+        We now use these to solve the continuous LQR problem. We form the Hamiltonian
+        \begin{multline} \label{eq:LQR_hamiltonian}
+            \mathcal{H}(x(t),u(t),J_x^*,t) = x^T(t) Q(t) x(t) + u^T(t) R(t) u(t) 
+            + J_x^{*T}(x(t),t)[A(t)x(t)+B(t)u(t)]
+        \end{multline}
+        and minimize it with respect to $u(t)$ by setting $\pdv*{\mathcal{H}}{u} = 0$:
+        \begin{equation}
+            \pdv{\mathcal{H}}{u} = Ru + B^T J_x^* = 0.
+        \end{equation}
+        Solving with respect to $u$ yields the optimal control 
+        \begin{equation}
+            u^* = -R^{-1}B^T J_x^*
+        \end{equation}
+        which is globally optimal since $\pdv*[2]{\mathcal{H}}{u} = R(t)$ is positive definite.
+
+        Substituting the optimal control back into our Hamiltonian \eqref{eq:LQR_hamiltonian}:
+        \begin{equation}
+            \begin{aligned}
+                \mathcal{H}(x,u^*,J_x^*,t) =& \frac{1}{2} x^T Q x 
+                    + \frac{1}{2} J_x^{*T} B R^{-1}B^T J_x^* 
+                    + J_x^{*T} [Ax - B R^{-1} B^T J_x^*] \\
+                =& \frac{1}{2} x^T Q x 
+                    - \frac{1}{2} J_x^{*T} B R^{-1}B^T J_x^* 
+                    + J_x^{*T} Ax
+            \end{aligned}
+        \end{equation}
+
+        We're now ready to use the Hamilton-Jacobi-Bellman equation \eqref{eq:HJB}.
+        Since the HJB equation is a first-order partial differential equation of the
+        minimum cost, we need to guess a solution, which we assume to be quadratic:
+        \begin{equation}
+            J^*(x(t),t) = \half x^T(t) K(t) x(t)
+        \end{equation}
+        where $K$ is a symmetric positive-definite matrix.
+
+        Plugging these into the HJB equation we get:
+        \begin{equation} \label{eq:LQR_presolution}
+            \begin{aligned}
+                0 = \half x^T \big(\dot{K} + Q - K^T B R^{-1}B^T K + 2 K A \big) x \\
+            \end{aligned}
+        \end{equation}
+        Leveraging the symmetry of quadratic forms and the fact that
+        \eqref{eq:LQR_presolution} must be equal to zero for all $x(t)$ we arrive at
+        the Riccati equation:
+        \begin{equation}
+            0 = \dot{K} + Q - K^T B R^{-1}B^T K + K A + A^T K.
+        \end{equation}
+        When solved for $K(t)$ using a specialized Riccati solver, the optimal control law is given by
+        \begin{equation}
+            u^*(t) = -R^{-1}(t)B^T(t)K(t)x(t).
+        \end{equation}
+
+    \subsection{Discrete Riccati Recursion} \label{sec:discrete_LQR}
+        We now shift our focus to solving the discrete-time LQR problem
+        \eqref{opt:discrete_LQR}. We start by defining the discrete cost-to-go function
+        \begin{equation}
+            V_k(x) = \min_{u_i,\dots,u_{N-1}} \half x_N^T Q x_N 
+                + \half \sum_{i=k}^{N-1} x_i^T Q_i x_i + u_i^T R_i u_i
+        \end{equation}
+        subject to the dynamics: $x_{k+1} = A_k x_k + B_k u_k$. This gives
+        the cost of starting at a particular state and moving towards the
+        goal in an optimal manner. The cost of the entire optimal trajectory
+        is therefore $V_1(x_1)$. From the Bellman equation and the principle
+        of optimality we can re-define the value function in a more
+        convenient, recursive form:
+        \begin{equation}
+            V_k(x) = \min_{u_k} \half x_k^T Q_k x_k 
+                + \half u_k^T R_k u_k 
+                + V_{k+1}(A_k x_k + B_k u_k)
+        \end{equation}
+        which simply states that the cost-to-go is the cost incurred
+        for the current decision, plus the cost-to-go of where our current
+        decision takes us (by simulating our dynamics forward one time
+        instance). For convenience, we define the action-value function
+        $Q(x_k,u_k)$ to be the value being minimized:
+        \begin{equation}
+            V_k(x) = \min_{u_k} Q(x_k,u_k)
+        \end{equation}
+        We also assume that $V_k(x)$ is a quadratic form, i.e. 
+        \begin{equation}
+            V_k(x) = \half x_k^T P_k x_k
+        \end{equation}
+        so that the action-value function takes the following form:
+        \begin{equation} \label{eq:LQR_Q}
+            Q(x_k,u_k) = \half x_k^T Q_k x_k + \half u_k^T R_k u_k 
+                + \half (A_k x_k + B_k u_k)^T P_{k+1} (A_k x_k + B_k u_k)
+        \end{equation}
+
+        Since there are no controls to optimize at the last time step, we note that
+        \begin{equation} \label{eq:LQR_termcost}
+            V_N(x) = \half x_N^T Q_N x_N
+        \end{equation}
+        Now that we know the terminal cost-to-go, we can find the optimal
+        cost-to-go for all time steps once we have a recurrence relation that
+        gives $V_k$ as a function of $V_{k+1}$. We start by optimizing the
+        action-value function at time step $k$, which has the following
+        first-order necessary condition:
+        \begin{equation}
+        \begin{aligned}
+            \pdv{Q}{u} =& 0 \\
+            =& R_k u_k + B^T P_{k+1}(A_k x_k + B_k u_k) 
+        \end{aligned}
+        \end{equation}
+        Solving for $u$ we find the optimal control trajectory:
+        \begin{equation} \label{eq:LQR_gain}
+            \begin{aligned}
+            u_k^* =& -(R_k + B_k^T P_{k+1} B_k)^{-1} B_k^T P_{k+1} A_k x_k \\
+            &= -Q_{uu}^{-1}Q_{ux} x_k \\
+            &= -K_k x_k
+            \end{aligned}
+        \end{equation}
+        where $Q_{uu} = \pdv*[2]{Q}{u}$ and $Q_{ux} = \pdv*{Q}{u}{x}$. 
+        % We introduce this notation for easy comparison to the more
+        % complicated DDP derivation in the following sections.
+
+        With an optimal feedback policy, we now substitute
+        \eqref{eq:LQR_gain} into \eqref{eq:LQR_Q} to get the cost-to-go:
+        \begin{equation}
+            \begin{aligned}
+                V_x(x) =& Q(x_k,u_k^*) \\
+                =& \half \big(x_k^T Q_k x_k + x_k^T K_k^T R_k K_k x_k  
+                +  x_k^T(A_k - B_k K_k)^T P_{k+1} (A_k - B_k K_k )x_k \big) \\
+                =& \half x^T \big( Q_k +  A_k^T P_{k+1} A_k  
+                + K_k^T (R_k + B^T P_{k+1} B_k) K_k  \\
+                &- K_k^T B_k^T P_{k+1} A_k - A_k P_{k+1} B_k K_k \big)x_k \\
+                =& \half x_k^T P_k x_k
+            \end{aligned}
+        \end{equation}
+        where, after substituting in \eqref{eq:LQR_gain} and simplifying,
+        \begin{equation}
+            P_k = Q_k +  A_k^T P_{k+1} A_k  
+                    - A_k^T P_{k+1}^T B_k (R_k + B_k^T P_{k-1} B_k)^{-1} B_k^T P_{k+1} A_k.
+        \end{equation}
+        This establishes the recurrence relation between $V_k$ and $V_{k+1}$,
+        which can be used to recursively calculate the cost-to-go for the
+        entire trajectory, along with the optimal feedback control gains
+        $K_k$.
+
+
+\section{Nonlinear Programming}
+    As mentioned in Sec. \ref{sec:lit_review}, direct methods solve the
+    discretized trajectory optimization problem \ref{opt:discrete_trajopt}
+    using generic nonlinear programming solvers. A wide variety of methods
+    exist for solving this difficult class of optimization problems. The
+    following sections provide some brief background on a sampling of the
+    most common methods. In this section, we refer to the following generic
+    NLP:
+
+    \begin{mini}[2] 
+        {x}{f(x)}{}{}
+        \addConstraint{g(x) = 0}
+        \addConstraint{h(x) \leq 0}
+        \label{opt:NLP}
+    \end{mini}
+    where $f : \R^n \mapsto \R$, $g : \R^n \mapsto \R^m$, and $h : \R^n \mapsto
+    \R^p$ are all assumed to be twice differential nonlinear functions. The first-order 
+    optimal conditions for this problem (i.e. the KKT conditions) are:
+    \begin{subequations}
+        \begin{align}
+            \nabla_x f(x) + \nabla_x g(x)^T \lambda - \nabla_x h(x)^T \mu &= 0 && \text{stationarity}\\
+            g(x) &= 0 && \text{primal feasibility}\\
+            h(x) &\leq 0 && \text{primal feasibility}\\
+            \mu_i &\geq 0, \; i \in \mathbb{N}_p && \text{dual feasibility}\\
+            \mu_i h(x)_i &=0, \; i \in \mathbb{N}_p && \text{complimentarity}.
+        \end{align}
+        \label{eq:nlp_kkt}
+    \end{subequations}
+
+\subsection{Penalty Methods} One of the simplest methods for handling
+    equality-constrained NLPs (e.g. $p$ = 0), penalty methods solve an
+    unconstrained optimization of the following form: \begin{mini}[2] {x}{f(x) +
+    \rho \varphi(g(x))}{}{} \end{mini} where $\varphi(x) : \R^m \mapsto \R$ is
+    some penalty function, often the quadratic penalty function $\varphi(x) = x^T
+    x$. These methods are extremely easy to implement, but require that the
+    penalty weight $\rho$ be increased to infinity to achieve zero constraint
+    violation, which leads to severe issues with numerical conditioning when
+    implemented in a computer. One way around this is to use an ``exact''
+    penalty method using the $L_1$-norm, which is not continuously
+    differentiable \cite{nocedal_Numerical_2006}. Penalty methods are therefore
+    rarely used in practice, especially since augmented Lagrangian methods are
+    simple extention to penalty methods that have dramatically better theoretical
+    and practical properties.
+
+
+\subsection{Augmented Lagrangian Method} \label{sec:background_alm}
+    The Augmented Lagrangian method (ALM) is straightforward improvement upon the 
+    simple penalty method. ALM minimizes the \textit{augmented Lagrangian}
+    \begin{equation}
+        \mathcal{L}_A(x, \lambda) = f(x) - \lambda^T g(x) + \frac{\rho}{2} g(x)^T g(x)
+    \end{equation}
+    with respect to the primal variables $x$, holding the dual variables $\lambda$ and 
+    penalty parameter $\rho$ constant. After converging to a local optima $x^*$, 
+    $\lambda$ and $\rho$ are updated using the following update rules:
+    \begin{equation} \label{eq:al_dual_update}
+        \lambda^+ = \lambda - \rho \, g(x^*)
+    \end{equation}
+    \begin{equation}
+        \rho^+ = \phi \rho
+    \end{equation}
+    where $\phi \in \R > 1$ is some geometric factor, typically around 10. After updating 
+    the dual variables and penalty parameter, the augmented Lagrangian is once again 
+    minimized, using the solution from the previous iteration $x^*$ as the initial guess.
+
+    Inequality constraints can be handled in a variety of ways, but we've found
+    the version set forth in \cite{toussaint_Novel_2014} to work
+    well in practice. We extend the definition of the augmented Lagrangian to be
+    \begin{equation}
+        \mathcal L_A(x; \lambda, \rho) = f(x) + \lambda^T g(x) + \mu^T h(x) 
+            + \frac{\rho}{2} g(x)^T g(x) + \half h(x)^T I_\rho h(x)
+    \end{equation}
+    where 
+    \begin{equation} \label{eq:penalty_matrix}
+        I_\rho = \begin{cases}
+            0 & \text{if } h(x)_i < 0 \; \wedge \; \mu_i > 0 \\
+            \rho & \text{otherwise}
+        \end{cases}
+    \end{equation}
+
+    The dual update for the inequality constraints simply projects the update multipliers 
+    back into the positive orthant:
+    \begin{equation}
+        \mu^+ = \text{max}(\mu + \rho \, h(x), 0)
+    \end{equation}
+    This is done to ensure that the dual feasibility condition is always
+    satisfied, while allowing the update to decrease the value of $\mu_i$ to 0
+    (to satisfy the complimentarity condition) when the i-th constraint becomes
+    satisfied.
+
+\subsection{Sequential Quadratic Programming}
+    Sequation quadratic programming (SQP) is a powerful method for solving nonlinear optimization 
+    problems. Many variations exhist, but typically solve a quadratic program (QP) of the 
+    following form:
+    \begin{mini}[2]
+        {x}{\half x^T P x + q^T}{}{}
+        \addConstraint{A x + b = 0}
+        \addConstraint{C x + d \leq 0}
+    \end{mini}
+    where $P \in \R^{n \times n}$ is an approximation of the Hessian of the Lagrangian,
+    $q \in \R^n$ is gradient of the Lagrangian, and 
+    $A \in \R^{m \times n}, b \in \R^m$,
+    $C \in \R^{p \times n}, d \in \R^p$ are
+    the first-order approximations of $g$ and $h$, respectively. 
+
+    SQP methods tend to be very amenable to warm-starting, especially if a good guess of the
+    active set of inequality constraints at the optimal solution is known apriori.
+    Good SQP implmentations tend to require lots of careful globalization methods to ensure
+    convergence, and tend to be fairly complicated to implement from scratch. The commercial
+    SNOPT solver \cite{gill_SNOPT_2005} is the most commonly used SQP solver. For more details,
+    see Chapter 18 of \cite{nocedal_Numerical_2006}.
+
+\subsection{Interior Point Method}
+    Interior point methods (IPM) have increasingly become the algorithm
+    of choice for solving convex optimization problems, including LPs, QPs
+    \cite{frison_HPIPM_2020}, and SOCPs
+    \cite{domahidi_ECOS_2013}. Extensions of IPM to nonlinear programming have
+    also shown impressive performance, but like SQP requires carefully
+    implemented globalization strategies to ensure robust convergence to a local
+    minima.
+
+    Interior point methods solve a series of reformulated problems of the form:
+    \begin{mini}
+        {x,s}{f(x) - \rho \sum_{i=1}^p \log{s_i}}{}{}
+        \addConstraint{g(x) = 0}
+        \addConstraint{h(x) + s = 0}
+    \end{mini}
+
+    The KKT conditions of this problem are 
+    \begin{subequations}
+        \begin{align}
+            \nabla f(x) + \nabla g(x)^T \lambda + \nabla h(x)^T \mu &= 0\\
+            g(x) &= 0 \\
+            h(x) + s &= 0 \\
+            s, \mu &\geq 0 \\
+            \mu_i - \rho \, s_i^{-1} &= 0, \; i \in \mathbb{N}_p 
+        \end{align}
+    \end{subequations}
+    The last equation can be written the more convenient matrix form:
+    \begin{equation} \label{eq:ipm_complimentarity}
+        \mu - \rho I(s)^{-1} e = 0
+    \end{equation}
+    where $I(x)$ is a diagonal matrix with the elements of the vector $x$ on the
+    diagonal, and $e \in \R^p = [1, \dots 1]^T$ is the all ones vector. Comparing
+    these with \eqref{eq:nlp_kkt} we see they are almost identical, with the exception
+    of the complimentarity condition, which is equal to the penalty parameter
+    $\rho$ instead of zero. Thus, on each iteration of IPM, a relaxed version of
+    the original KKT conditions is solved, achieving convergence to the true
+    minima as $\rho \rightarrow 0$.
+
+    Taking a first-order Taylor series approximation of these conditions, we
+    obtain the following linear system:
+    \begin{equation}
+        \begin{bmatrix}
+            \nabla^2 \mathcal{L} & 0 & \nabla g^T & \nabla h^T \\
+            0 & I(\mu) & 0 & I(s) \\
+            \nabla g & 0 & 0 & 0 \\
+            \nabla h & I & 0 & 0 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            \Delta x \\
+            \Delta s \\
+            \Delta \lambda \\
+            \Delta \mu\\
+        \end{bmatrix} = -
+        \begin{bmatrix}
+            \nabla f(x) + \nabla g(x)^T \lambda + \nabla h(x)^T \mu \\
+            I(s) \mu - \rho e \\
+            g(x) \\
+            h(x) + s \\
+        \end{bmatrix}
+    \end{equation}
+    where the second line is obtained by multiplying \eqref{eq:ipm_complimentarity} by $I(s)$.
+    This system can be converted into an equivalent symmetric system of equations by multiplying
+    the second block row by $I(s)^{-1}$ and defining $\Sigma = I(s)^{-1} I(\mu)$:
+    \begin{equation}
+        \begin{bmatrix}
+            \nabla^2 \mathcal{L} & 0 & \nabla g^T & \nabla h^T \\
+            0 & \Sigma & 0 & -I \\
+            \nabla g & 0 & 0 & 0 \\
+            \nabla h & -I & 0 & 0 \\
+        \end{bmatrix} 
+        \begin{bmatrix}
+            \Delta x \\
+            \Delta s \\
+            -\Delta \lambda \\
+            -\Delta \mu\\
+        \end{bmatrix} = -
+        \begin{bmatrix}
+            \nabla f(x) + \nabla g(x)^T \lambda + \nabla h(x)^T \mu \\
+            \mu - \rho I(s)^{-1} e \\
+            g(x) \\
+            h(x) + s \\
+        \end{bmatrix}
+    \end{equation}
+
+    Interior point methods tend to converge very quickly to tight tolerances, exhibiting 
+    quadratic convergence near the solution. However, they tend to be less amenable to 
+    warm-starting than SQP or ALM. The most common implementation is the open-source 
+    Ipopt solver \cite{wachter_implementation_2006}, which uses a filter approach together 
+    with a feasibility restoration phase for improving globalization. For more details on
+    interior point methods for solving LPs, QPs, and NLPs, see 
+    \cite{nocedal_Numerical_2006}.
+
+\end{document}

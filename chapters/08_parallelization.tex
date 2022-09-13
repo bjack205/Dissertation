@@ -1,0 +1,198 @@
+\documentclass[../root.tex]{subfiles}
+
+\begin{document}
+\chapter{Parallelizing Trajectory Optimization} \label{chap:parallel}
+
+\lettrine{M}{odern} implementations of trajectory optimization algorithms
+such as ALTRO (see Chapters \ref{chap:altro}-\ref{chap:attitude},
+\cite{howell_ALTRO_2019}), OCS2 \cite{farshidian_OCS2_}, Frost
+\cite{hereid_FROST_2017}, Drake \cite{tedrake_Drake_}, or Crocoddyl
+\cite{mastalli_Crocoddyl_2019} have acheived impressive performance results.
+However, as we continue to put these algorithms out into the real world and
+apply them on increasingly difficult problems, the demand for even faster
+algorithms will continue to rise. Faster trajectory optimization algorithms
+can be helpful in at least two ways: 1) Faster replanning enables more
+adaptive / reactive behavior, or alternatively allows for the online solution
+of more complicated problems. In order to remain computationally tractable,
+many practitioners make strong assumptions on the low-level MPC controllers
+that are solved online. Relaxing these assumptions could open up new
+frontiers in terms of both performance and safety of these systems. 2) Faster
+offline planning allows for a larger variety of solutions to be found and
+enables quicker turn-around time for practitioners designing the
+trajectories. As most practitioners know, nonlinear trajectory optimization
+is an art form where the available modes of expression include initial
+guesses, cost shaping, and constraint modification / problem reformulation.
+Getting the solve time out of the way of the designer allows for more rapid
+feedback and better convergence towards high-quality trajectories.
+Alternatively, it allows for more runs to be executed in a Monte-Carlo-style
+approach, as is often used in space trajectory design where the optimized
+trajectories may appear chaotic and/or extremely sensitive to the initial
+guess
+\cite{grebow_MCOLL_2017,englander_Multiobjective_2015,tracy_LowThrust_2021}.
+Reducing the runtime by an order of magnitude or more means that solutions
+that used to take weeks or months take days or even hours, saving massive
+amounts of compute time.
+
+While some of these solver implementations have leveraged parallelization in
+parts of the classical algorithms such as direct collocation or DDP, the
+algorithms themselves either remain inherently serial---in the case of DDP---or 
+rely on single-threaded NLP solvers---in the case of direct collocation. As
+we're slowly approaching the limit of what single-threaded applications can
+achieve, it's apparent that further dramatic speed improvements can only be
+achieved through parallelization. As a result, there has naturally been an
+increased interest within the community to leverage parallelization. Much of
+this work has only demonstrated parallelization in theory, such as the use of
+ALM to parallelize an SQP algorithm \cite{kouzoupis_block_2016},
+parallelization of the quadratic MPC problem \cite{frasch_parallel_2015}, or
+parallelization of function and gradient evaluations using a discrete
+algebraic equation (DAE) solver \cite{leineweber_efficient_2003}. The most
+common approach is to simply parallelize the dynamics, cost, and derivative
+information required during the algorithms \cite{giftthaler_Family_2017,
+mastalli_Crocoddyl_2019, antony_Rapid_2017, neunert_WholeBody_2018}. In an
+attempt to open up further parallelism within shooting-based methods like
+DDP, many researchers have investigated multiple-shooting techniques where
+the trajectory is split into sub-trajectories that can be optimized in
+parallel, while maintaining some continuity constraints between the
+sub-trajectories \cite{bock_Multiple_1984,giftthaler_Family_2017}. Taking
+this approach to the limit, \cite{plancher_Performance_2020} ported this
+algorithm onto GPUs and FPGAs (field-programmable gate arrays), demonstrating
+some sizeable performance gains, but found that this method displayed an
+undesireable tradeoff between parallelism and convergence. More promising
+results were recently found using ADMM (Alternating Direction Method of Multipliers)
+on large-scale distributed MPC applications \cite{alonso_Effective_2021}.
+Another impressive recent result found trajectories for systems with contact 
+(e.g. walking robots) by smoothing the contact forces, using a clever formulation 
+of the dynamics, using a parallel factorization method for the resulting 
+block-tridiagonal system. They achieved a 30x runtime improvement over a
+similar implementation on a multi-core CPU \cite{pan_GPUbased_2019}.
+
+Rather than trying to parallelize gradient or Newton-based methods, some researchers 
+have taken sampling-based approaches, which are naturally better suited to 
+massive parallelization. Some impressive results using Model Predictive Path Integral 
+Control (MPPI) have been demonstrated on small-scale off-road racing, where the 
+car is able to ``adapt'' its strategy to learn the best actions to corner on dirt at 
+high speeds \cite{williams_Aggressive_2016}. Several papers have been published on 
+various methods of mapping variants of this algorithm to GPUs 
+\cite{williams_Model_2015,phung_Model_2017}. The key drawbacks of these approaches 
+is that they don't scale well to problems with higher dimensions and don't work 
+well for systems that are highly unstable, where small variations in the control input 
+result in massive changes in the trajectory. Another interesting approach uses genetic 
+algorithms to solve the MPC problem, which again can be mapped extremely well to a GPU 
+\cite{hyatt_Realtime_2017,hyatt_RealTime_2020}. 
+
+
+\section{Preliminary Work}
+
+In a departure from most of the current work attempting to parallelize
+trajectory optimization problems, which look for ways to map existing,
+well-proven Newton-based algorithms such as DDP onto accelerated hardware
+like GPUs \cite{plancher_Performance_2020, giftthaler_Family_2017} our
+approach is to take a step back and investigate naturally parallelizable
+Newton or gradient-based algorithms that may map well onto the trajectory
+optimization problem, similar to \cite{alonso_Effective_2021,
+pan_GPUbased_2019}. In our research so far, we are investigating a couple
+different options, detailed in the following sub-sections.
+
+\subsection{Preconditioned Conjugate Gradient}
+Preconditioned conjugate gradient (PCG) is a popular method for approximately
+solving linear systems \cite{nocedal_Numerical_2006}. Instead of direct methods
+which factorize a matrix into diagonal or triangular matrices that can then 
+be easily solved (e.g. Cholesky, LU, LDL, QR, etc.), indirect methods such as
+PCG solve an unconstrained optimization problem where the solutions 
+converge to the solution of the linear system $Ax = b$. 
+These methods are dominated by 
+sparse matrix-vector multiplications, which easily leverage sparsity and 
+map well onto parallel computing hardware. 
+
+One of the disadvantages of these methods, including PCG, is their 
+sensitivity to numerical conditioning. To mitigate this issue, PCG 
+allows for a \textit{preconditioner} $P$ such that the new linear system
+being solved is 
+\begin{equation}
+    PAx = Pb.
+\end{equation}
+The goal is then to find a good preconditioner $P$ that is easily invertible
+and that improves the numerical conditioning of the linear system, 
+especially one whose inverse can be computed in parallel. The use of preconditioned
+Krylov methods was recently used for nonlinear MPC \cite{knyazev_Sparse_2016}. 
+
+\subsection{Nested Dissection}
+The trajectory optimization problem can be viewed as a graph that is almost
+a simple path graph, as shown in Fig. \ref{fig:LQR_graph}. This graphical 
+representation of the LQR problem isn't new, and has been studied by the 
+state estimation and mapping community for several years, where they cast the 
+control problem as a probabilistic inference problem \cite{toussaint_Robot_2009a}.
+In recent years, the SLAM (simuntaneous localization and mapping) community has 
+focused on efficient solvers for inference on the descriptive ``factor graph'' that
+encodes the relationships between states and measurements across time 
+\cite{dellaert_Factor_2017,kaess_iSAM2_2012}. Using state-of-the-art solvers such as
+iSAM2 \cite{kaess_iSAM_2008,kaess_iSAM2_2012}, this community has shown some promising
+results solving a reformulation of the LQR problem 
+\cite{yang_Equality_2020,dong_Motion_2016,mukadam_Gaussian_2016}. However, most of the 
+approaches still use sequential CPU-based solvers like \cite{kaess_iSAM2_2012}. 
+Some recent work by this community shows some extremely promising computational results 
+using Gaussian Belief Propagation (GBP), solved using novel Intelligence Processing Units 
+(IPUs) \cite{davison_FutureMapping_2019,ortiz_Bundle_2020}.
+
+Nested dissection is one of the many algorithms used by the numerical
+computation community to solve problems on graphs, and one that shows promise
+for solving the LQR sub-problem that arises in many algorithms for nonlinear
+trajectory optimization. The algorithm, originally introduced by Alan George
+in 1973 \cite{george_Nested_1973}, was originally designed for solving square
+mesh grids and later generalized to generic planar graphs
+\cite{lipton_Generalized_1979}. It works by recursively dividing the mesh grid
+into quadrants. After solving the lowest level of the recursive partitioning
+using small, dense matrix factorizations, the information is propagated back
+through the recursion using Shur compliments. The algorithm has been
+extensively studied through the last several decades, and is summarized well
+in \cite{khaira_Nested_}. Unsuprisingly, the algorithm was also picked up by
+the SLAM community back in 2010 \cite{ni_Multilevel_2010}. The key idea is to
+identify efficient ``separating'' variables that, when eliminated, result in
+disconnected components in the underlying graph structure, equivalent to
+solving block-diagonal linear system. For the LQR problem (see Fig.
+\ref{fig:LQR_graph}), it is easy to see that by selecting the dual variables
+associated with the dynamics constraints (i.e. $\lambda_2, \dots, \lambda_N$) the
+graph separates cleanly.
+
+Our preliminary efforts at implementing this algorithm show promise, but significant work
+still remains to find an efficient way to implement the unique structure of the LQR problem
+within the context of nested dissection while efficiently leveraging the resulting 
+parallelism. 
+
+\begin{figure}
+    \centering
+    \includegraphics{figures/parallel/lqr_graph2.tikz}
+    \caption{LQR graph}
+    \label{fig:LQR_graph}
+\end{figure}
+
+\section{Future Work}
+
+Given that the preliminary results are very early-stage, there is substantial work to 
+be done on this project. We plan to first implement the nested dissection algorithm for 
+LQR problems on a multi-core CPU, leveraging SIMD instructions for increased parallelization.
+This will be compared against standard Riccati recursion, which has linear complexity 
+in the time horizon and cubic complex in the state and control dimensions. This then 
+needs to be incorporated into a nonlinear optimization method like SQP or ALM, or perhaps
+a combination of the two, and compared against other standard algorithms like direct 
+collocation and DDP.
+
+There is also potential for using nested dissection or similar methods to extend the work 
+to multi-body systems represented with maximal coordinates, since these systems should have
+a meshgrid-like underlying graph structure \cite{brudigam_LinearTime_2020}. This approach 
+may be able to jointly parallelize over both the trajectory optimization problem and 
+the dynamics evaluations, and lend itself nicely to an easy-to-use software library 
+that works for arbitrary multi-link robots, although the ability to handle closed-loop 
+kinematics is uncertain.
+
+There also might be some interesting avenues of research investigating the use of the 
+related multigrid methods used by the FEA (finite element analysis) community, which 
+take a similar hierachical approach to solving rectangular meshes. Although this might 
+be beyond the scope of this work, an interesting application could be including a 
+small-scale CFD (computational fluid dynamics) simulation to account for complicated 
+aerodynamics for aerial systems like quadrotors flying near walls, through the wake 
+of other quadrotors, or aggresive aerial maneuvers for fixed-wing airplanes.
+
+
+
+\end{document}

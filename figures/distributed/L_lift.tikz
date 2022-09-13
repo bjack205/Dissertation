@@ -1,0 +1,65 @@
+\begin{tikzpicture}[]
+\begin{axis}[legend style = {{at={(1.0,0.75)},anchor=north east}}, ylabel = {Time (s)}, xmin = {3.0}, xmax = {15}, axis equal image = {false}, ymax = {45}, ymode = {log}, xlabel = {Number of lift agents}, hide axis = {false}, grid=both]\addplot+ [mark = {}, color=blue, thick]coordinates {
+(3.0, 1.521)
+(4.0, 6.0266)
+(5.0, 6.4757)
+(6.0, 10.4257)
+(7.0, 10.5166)
+(8.0, 13.476)
+(10.0, 20.3489)
+(11.0, 24.5767)
+(12.0, 28.4216)
+(13.0, 31.9788)
+(14.0, 35.8373)
+(15.0, 41.173)
+};
+\addlegendentry{Batch}
+
+\addplot+ [mark = {}, color=orange, thick]coordinates {
+(3.0, 0.551729377)
+(4.0, 0.590316689)
+(5.0, 0.642833104)
+(6.0, 0.714299193)
+(7.0, 1.122374544)
+(8.0, 0.863160927)
+(9.0, 1.016495778)
+(10.0, 1.095042088)
+(11.0, 1.397241589)
+(12.0, 1.518634259)
+(13.0, 1.935622008)
+(14.0, 1.579718871)
+(15.0, 1.817218754)
+};
+\addlegendentry{Parallel}
+\addplot+[scatter, scatter src=explicit symbolic, only marks = {true}, scatter/classes = {{a={mark=*,blue,scale=1.0, mark options={fill=blue}}}}] coordinates {
+(3, 1.521) [a]
+(4, 6.0266) [a]
+(5, 6.4757) [a]
+(6, 10.4257) [a]
+(7, 10.5166) [a]
+(8, 13.476) [a]
+(10, 20.3489) [a]
+(11, 24.5767) [a]
+(12, 28.4216) [a]
+(13, 31.9788) [a]
+(14, 35.8373) [a]
+(15, 41.173) [a]
+};
+\addplot+[scatter, scatter src=explicit symbolic, only marks = {true}, scatter/classes = {{a={mark=*,orange,scale=1.0, mark options={fill=orange}}}}] coordinates {
+(3, 0.551729377) [a]
+(4, 0.590316689) [a]
+(5, 0.642833104) [a]
+(6, 0.714299193) [a]
+(7, 1.122374544) [a]
+(8, 0.863160927) [a]
+(9, 1.016495778) [a]
+(10, 1.095042088) [a]
+(11, 1.397241589) [a]
+(12, 1.518634259) [a]
+(13, 1.935622008) [a]
+(14, 1.579718871) [a]
+(15, 1.817218754) [a]
+};
+\end{axis}
+
+\end{tikzpicture}

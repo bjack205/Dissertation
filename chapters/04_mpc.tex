@@ -1,0 +1,283 @@
+
+\documentclass[../root.tex]{subfiles}
+
+\begin{document}
+\chapter{ALTRO-C: A Fast Solver for Conic Model-Predictive Control} \label{chap:altro_c}
+\chaptermark{ALTRO-C}
+Building off the results of the previous chapter, here we detail the extension of the
+ALTRO algorithm to second-order cone programs (SOCPs), as well as details regarding
+an improved implementation that enables the state-of-the-art performance on convex 
+MPC problems demonstrated in this chapter. 
+This work originally appeared in \cite{jackson_ALTROC_2021}.
+
+\section{Introduction}
+    \lettrine{M}{odel-predictive control} 
+    (MPC) has become a widely used approach for
+    controlling complex robotic systems with several notable successes in
+    recent years
+    \cite{blackmore_Autonomous_2016,kuindersma_Optimizationbased_2016,carlo_Dynamic_2018}.
+    By transforming the control problem into an optimization problem with an
+    explicit objective and constraints, MPC can achieve desired behaviors
+    while accounting for complex dynamics, torque limits, and obstacle
+    avoidance. However, because these optimization problems must typically be
+    solved at rates of tens to hundreds of Hertz on board the robot,
+    efficient and reliable solver algorithms are crucial to their success.
+    
+    In practice, most MPC problems are formulated as convex optimization
+    problems, since convex solvers are available that can guarantee
+    convergence to a globally optimal solution, or provide a certificate of
+    infeasibility if a solution does not exist. A variety of numerical
+    techniques for solving such problems have been developed over the past
+    several decades, and many high-quality solver implementations---both
+    open-source and proprietary---are available. In the control community, a
+    particular emphasis has been placed on high-performance solvers for
+    quadratic programs (QPs) that are suited to real-time use on embedded
+    computing hardware, including active-set \cite{ferreau_qpOASES_2014}
+    \cite{kuindersma_efficiently_2014}, interior-point
+    \cite{frison_Efficient_2014,frison_Highperformance_2014, frison_HPIPM_2020}, 
+    and alternating
+    direction method of multipliers (ADMM) \cite{stellato_OSQP_2020} methods. There has
+    also been at least one interior-point solver for second-order cone
+    programs (SOCPs) developed for embedded applications \cite{domahidi_ECOS_2013}.
+   
+
+    To achieve high performance on MPC problems, a solver must a) exploit
+    problem structure with sparse matrix factorization techniques, b) take
+    advantage of previous solutions to ``warm start'' the current solve, and
+    c) efficiently handle convex conic constraints on states and inputs. We
+    present ALTRO-C, a more capable version of the ALTRO solver
+    \cite{howell_ALTRO_2019} originally developed for offline solution of nonlinear
+    trajectory optimization problems, that achieves all three of these
+    properties. As a result, it delivers state-of-the-art performance on both
+    QPs and SOCPs in MPC applications, and can easily support optimization
+    over other cones in the future. To the best of our knowledge, ALTRO-C is
+    the first solver specifically designed for MPC applications that can
+    handle second-order cone constraints.
+
+    In summary, our contributions include:
+    \begin{itemize}
+        \item A novel method for incorporating conic---including second-order
+        cone---constraints into a Differential Dynamic Programming
+        (DDP)-based trajectory optimization solver.
+        \item An open-source solver implementation in Julia that delivers
+        state-of-the-art performance for convex MPC problems with a
+        convenient interface for defining trajectory optimization problems.
+        \item A suite of benchmark MPC problems that demonstrate the solver's
+        performance, including a satellite with flexible appendages, a
+        quadruped with both linearized and second-order friction cones,
+        rocket soft-landing, and manipulation with contact.
+    \end{itemize}
+
+    \section{Conic Augmented Lagrangian} \label{sec:conic-al}
+
+    There has been great interest in recent years within the optimization
+    community in optimization over cones, sometimes referred to as
+    \textit{generalized inequalities}. The second-order cone,
+    $\mathcal{K}_\text{soc} = \{(v,s) \in \R^{n+1} \,|\, \norm{v}_2 \leq
+    s\}$, 
+    (also known as the \textit{quadratic cone} or the \textit{Lorentz
+    cone}) has proven particularly useful in control applications including
+    the rocket soft-landing problem \cite{acikmese_Convex_2007}
+    \cite{acikmese_Lossless_2013} and friction cone constraints that appear
+    in manipulation or locomotion tasks \cite{lobo_Applications_1998}. Before methods
+    existed for directly attacking SOCPs, many practitioners linearized this
+    cone, resulting in increased problem sizes and less accurate or
+    sub-optimal solutions.
+    
+    Most existing specialized ``conic'' solvers are based on ADMM
+    \cite{garstka_COSMO_2019,odonoghue_Conic_2016} or interior-point
+    \cite{domahidi_ECOS_2013} methods. Both of these approaches have tradeoffs:
+    ADMM methods converge slowly (linearly) but are very warm-startable,
+    while interior-point methods converge quickly (quadratically) but aren't
+    well-suited to warm-starting. The augmented Lagrangian method (ALM) is an
+    attractive middle-ground, offering both superlinear convergence and good
+    warm-starting capabilities.
+    
+    Despite some theoretical work showing promising convergence analyses of
+    ALM for conic programs 
+    \cite{liu_Convergence_2008,shapiro_Properties_2004,sun_rate_2008,cui_Rsuperlinear_2019,hang_Augmented_2020}
+    and several ALM
+    implementations for solving large-scale semi-definite programs (SDPs)
+    \cite{zhao_NewtonCG_2010,li_QSDPNAL_2018}, no ALM implementation for SOCPs
+    existed until very recently \cite{liang_Inexact_2020}.
+    %, which demonstrated state-of-the-art performance compared to Mosek and
+    %SDPT3 \cite{toh1999sdpt3} on large-scale problems.
+    Building on that work, our aim is to develop an ALM SOCP solver that
+    exploits the special structure of MPC problems.
+
+    As described in Sec. \ref{sec:background_alm}, augmented Lagrangian
+    methods solve constrained optimization problems by solving a series of
+    unconstrained problems minimizing the
+    \textit{augmented Lagrangian}:
+    \begin{equation} \label{eq:augmented_lagrangian}
+        \mathcal{L}_A(x) = f(x) - \lambda^T c(x) + \rho \half c(x)^T c(x),
+    \end{equation}
+    where $f(x) : \R^{n} \mapsto \R^{}$ is the objective function, $c(x) : \R^{n}
+    \mapsto \R^{m}$ is an equality constraint function, $\lambda \in \R^{m}$ is a
+    Lagrange multiplier, and $\rho \in \R$ is a penalty weight. This standard
+    form can also be adapted to handle inequality constraints, as described
+    in \cite{howell_ALTRO_2019} \cite{toussaint_Novel_2014}.
+    
+    After each unconstrained minimization of \eqref{eq:augmented_lagrangian}
+    with respect to $x$, the penalty $\rho$ is increased and the Lagrange
+    multiplier $\lambda$ is updated according to,
+    \begin{equation} \label{eq:al_dual_update2}
+        \lambda \gets \left( \lambda - \rho c(x) \right) ,
+    \end{equation}
+    which is equivalent to a gradient ascent step on the dual problem \cite{bertsekas_Constrained_1996}.
+    Augmented Lagrangian methods are theoretically capable of superlinear
+    convergence rates, but often exhibit poor ``tail-convergence'' behavior
+    in practice due to ill-conditioning as $\rho$ is increased.
+    %In contrast, interior-point and active-set methods can achieve local quadratic convergence rates near an optimum.
+    
+    Based on \cite{liu_Convergence_2008}, we generalize the augmented
+    Lagrangian method to enforce general conic constraints. Equation
+    \eqref{eq:augmented_lagrangian} can be rewritten as,
+    \begin{equation}
+        \mathcal{L}_A(x) = f(x) + \frac{1}{2 \rho} (\norm{\lambda - \rho c(x)}^2 - \norm{\lambda}^2).
+    \end{equation}
+    Comparing the first quadratic penalty term $\lambda - \rho c(x)$ with the
+    standard dual ascent step \eqref{eq:al_dual_update2}, we see that this
+    reformulation is effectively penalizing the difference between the
+    current and updated Lagrange multiplier estimates.
+    
+    If our constraint is instead required to lie within the cone
+    $\mathcal{K}$, we can modify the augmented Lagrangian penalty to penalize
+    the difference between the multipliers after the updated multiplier is
+    projected back into the cone,
+    \begin{equation} \label{eq:conic_augmented_lagrangian}
+        \mathcal{L}_A(x) = f(x) + \frac{1}{2 \rho} (\norm{\Pi_\mathcal{K}(\lambda - \rho c(x))}^2 - \norm{\lambda}^2),
+    \end{equation}
+    where $\Pi_\mathcal{K}(x) : \R^{p} \mapsto \R^{p}$ is the projection operator
+    for the cone $\mathcal{K}$. We refer to
+    \eqref{eq:conic_augmented_lagrangian} as the \textit{conic augmented
+    Lagrangian}.
+    
+    For simple inequality constraints of the form $c(x) \leq 0$, the
+    projection is onto the non-positive orthant: $\Pi_{\mathcal{K}_-}(x) =
+    \min(0,x)$. Simple closed-form expressions for the projection operator
+    exist for several other cones, including the second-order cone:
+    \begin{equation} \label{eq:soc_projection}
+        \Pi_{\mathcal{K}_\text{soc}}(x) = \begin{cases}
+            0 & \norm{v}_2 \leq -s \\
+            x & \norm{v}_2 \leq s  \\
+            \half (1 + s/\norm{v}_2) [v^T \; \norm{v}_2]^T & \norm{v}_2 > \abs{s}
+        \end{cases}
+    \end{equation}
+    where $v = \begin{bmatrix} x_0 \dots x_{p-1} \end{bmatrix}^T$, $s = x_p$.
+    Analogous to \eqref{eq:al_dual_update2}, the dual update in the conic case
+    becomes,
+    \begin{equation}
+        \lambda \gets \Pi_\mathcal{K}(\lambda - \rho c(x)) .
+    \end{equation}
+    
+    This method for handling conic constraints is the key algorithmic
+    development in ALTRO-C, enabling the competitive timing and convergence
+    results demonstrated in Section \ref{sec:mpc_examples}.
+    
+    % %and the penalty term is updated as normal.
+    
+    
+    \section{ALTRO-C Solver} 
+    %     %The ALTRO solver is a fast solver for constrained, non-convex trajectory optimization that uses iterative LQR (iLQR) within an augmented Lagrangian framework to handle general equality and inequality constraints. To handle the slow tail convergence typically exhibited by augmented Lagrangian methods, ALTRO uses an active-set projected Newton method for solution polishing. The algorithm is summarized in the following paragraphs.
+        
+        The original ALTRO algorithm, described in Sec. \ref{chap:altro} and
+        \cite{howell_ALTRO_2019}, was modified using the formulation in
+        \ref{sec:conic-al} to handle second-order cone constraints and was
+        renamed ALTRO-C. Analytic first and second-order derivatives of
+        \eqref{eq:soc_projection} were implemented to calculate the
+        expansions of \eqref{eq:conic_augmented_lagrangian} required by the
+        iLQR algorithm. No changes were made to the active-set
+        solution-polishing method. To our knowledge, ALTRO-C is the first
+        DDP-based algorithm to support conic constraints, and one of the
+        first optimal control solvers in general to support generalized
+        inequalities.
+
+        In addition to adding second-order cone constraints, the Julia
+        implementation of ALTRO-C has been improved substantially from the
+        original version presented in \cite{howell_ALTRO_2019}, enabling the competitive
+        timing results demonstrated in Section \ref{sec:mpc_examples}. Memory
+        allocations have been eliminated wherever possible, and ALTRO-C has been
+        particularly optimized for small-to-medium-size problems by leveraging
+        loop-unrolling and analytical linear algebra\footnote{These algorithms
+        are part of the
+        \href{https://github.com/JuliaArrays/StaticArrays.jl}{StaticArrays.jl}
+        package}.
+        If the problems are small enough, the matrix operations in the
+        backward pass are stored on the stack and all operations are unrolled
+        at compile time, resulting in speed improvements of 10-100x over the
+        built-in heap-allocated Julia arrays that use BLAS or LAPACK linear
+        algebra subroutines. On the benchmark problems included in
+        \cite{howell_ALTRO_2019}, these performance enhancements achieved
+        anywhere from a 65-140x improvement in runtime performance over the
+        original implementation.
+        %made available through packages in the Julia ecosystem.
+        In addition to excellent performance, ALTRO-C provides a convenient API
+        that dramatically simplifies MPC problem definition and provides
+        convenient and efficient methods for updating the MPC problem between
+        iterations. 
+        By providing several methods for modifying the problem and
+        constraints in-place, ALTRO is uniquely well-suited to solving MPC
+        problems, especially since the solver is well-suited to warming-starting.
+        While not as lightweight as embedded solvers such as ECOS, Julia can be
+        run on ARM processors, and future work will investigate runtime performance
+        on microcomputers.
+
+        % In contrast to many modern ``direct''
+        % methods for trajectory optimization, ALTRO relies on iterative LQR
+        % (iLQR) to remain dynamically feasible at every iteration and exploit
+        % the Markovian structure of MPC problems. At each iteration of the
+        % iLQR algorithm (summarized in Algorithm \ref{alg:iLQR}), a
+        % second-order Taylor series approximation of the problem is computed
+        % and a backward Riccati recursion is used to compute an update to the
+        % nominal (feed-forward) control trajectory and a time-varying LQR
+        % (TVLQR) feedback controller. The closed-loop dynamics are then
+        % simulated forward to compute an updated state trajectory.
+        
+        % While fast and efficient, the standard iLQR algorithm has no ability
+        % to deal with constraints on the states or controls. To handle
+        % constraints, ALTRO uses iLQR as the inner unconstrained solver in an
+        % augmented Lagrangian method. To overcome the poor tail convergence of
+        % the ALM in situations where tight solution tolerances are required,
+        % ALTRO performs a final active-set projected Newton
+        % ``solution-polishing'' step using a Cholesky factorization coupled
+        % with iterative refinement \cite{howell_ALTRO_2019}. The key
+        % algorithmic difference between the original ALTRO algorithm and
+        % ALTRO-C is the ability to handle generalized inequalities using the
+        % method described in Section \ref{sec:conic-al}. To our knowledge,
+        % ALTRO-C is the first DDP-based algorithm to support conic
+        % constraints.
+        %ALTRO tends to converge quadratically to very good constraint satisfaction with just 1 or 2 of these projected Newton iterations.
+    
+    %     \begin{algorithm}
+    %     \begin{algorithmic}[1]
+    %     \caption{iLQR} \label{alg:iLQR}
+    %         \Function{iLQR}{$\ell,f,X,U$} 
+    %             \While{not converged}
+    %                 \State $J(\delta X,\delta U) \leftarrow$ Quadratic expansion of $\ell$ at $X,U$
+    %                 \State $A_{1:N}, B_{1:N} \leftarrow$ Linearize dynamics $f$ at $X,U$
+    %                 \State $K_{1:N},d_{1:N} \leftarrow \textproc{TVLQR}(J,A_{1:N},B_{1:N})$
+    %                 \State $\alpha \leftarrow 1$
+    %                 \For{k=1:N-1}
+    %                     \State $\bar{u}_k = u_k + K_k(\bar{x}_k - x_k) + \alpha d_k$
+    %                     \State $\bar{x}_{k+1} \leftarrow$ $f(\bar{x}_k, \bar{u}_k)$
+    %                 \EndFor
+    %                 \If{line search conditions satisfied}
+    %                     \State $X \leftarrow \bar{X}, U \leftarrow \bar{U}$
+    %                 \Else
+    %                     \State Reduce $\alpha$ and go to line 7
+    %                 \EndIf
+    %             \EndWhile\\
+    %             \Return $X,U$
+    %     \EndFunction
+    %     \end{algorithmic}
+    %     \end{algorithm} 
+        
+    
+    % \subsection{Implementation Details} \label{sec:implementation}
+    % The ALTRO solver was adapted to support second-order cone constraints
+    % using the augmented Lagrangian formulation introduced in Section
+    % \ref{sec:conic-al}. 
+    
+
+\end{document}

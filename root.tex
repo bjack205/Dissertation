@@ -1,0 +1,164 @@
+\documentclass[10pt,oneside]{book}
+\usepackage[utf8]{inputenc}
+\usepackage{import}
+\usepackage{lscape}
+\usepackage{lettrine}
+\usepackage[left=1.5in, right=1in, top=1in, bottom=1in]{geometry}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\lhead{\leftmark}
+\cfoot{\thepage}
+
+\usepackage{graphicx}
+\graphicspath{{figures/},{figures/altro/}}
+
+% Attitude Paper Commands
+\newcommand{\Q}{\mathbb{S}^3}
+\newcommand{\skewmat}[1]{[#1]^\times}
+\newcommand{\rmap}{\varphi}
+\newcommand{\invrmap}{\varphi^{-1}}
+\newcommand{\rot}{ \mathcal{R} }
+\newcommand{\dq}{\delta q}
+\newcommand{\q}{\textbf{q}}
+\newcommand{\eq}{_\text{eq}}
+\newcommand{\traj}[2][N]{#2_{0:{#1}}}
+\newcommand{\pass}{{\color{green} \checkmark}}
+\newcommand{\fail}{{\color{red} \ding{55}}}
+\newcommand{\inframe}[2]{{}^{#1}\!#2}
+\newcommand{\toframe}[3]{\inframe{#1}{#3}^{#2}}
+
+% Distributed paper commands
+\newcommand*\rotbf[1]{\rotatebox{90}{\textbf{#1}}}
+\newcommand{\specialcell}[2][c]{\begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+\newcommand{\specialcellbold}[2][c]{%
+	\bfseries
+	\begin{tabular}[#1]{@{}l@{}}#2\end{tabular}%
+}
+
+% Bibliography
+\usepackage[style=ieee]{biblatex}
+\addbibresource{TrajOptSurvey.bib}
+\addbibresource{Publications.bib}
+
+\usepackage{brian}
+\usepackage{subfiles}
+
+\usepackage[explicit]{titlesec}
+\usepackage{color}
+\definecolor{RIRed}{RGB}{148,19,30}
+\newlength\chapnumb
+\setlength\chapnumb{4cm}
+\titleformat{\chapter}[block]
+    {\normalfont\sffamily}{}{0pt}
+    {
+        \parbox[b]{\chapnumb}
+        {\fontsize{120}{110}\color{RIRed}\selectfont\thechapter}%
+        \parbox[b]{\dimexpr\textwidth-\chapnumb\relax}{%
+        \raggedleft%
+        \hfill{\huge#1}\\
+        {\color{black}{\rule{\dimexpr\textwidth-\chapnumb\relax}{0.8pt}}}}
+    }
+\titleformat{name=\chapter,numberless}[block]
+    {\normalfont\sffamily}{}{0pt}
+    {
+        % \parbox[b]{\chapnumb}{\mbox{}}%
+        \parbox[b]{\dimexpr\textwidth-\chapnumb\relax}{%
+        \huge#1\\
+        % \raggedleft%
+        % \hfill{\huge#1}\\
+        \rule{\textwidth}{0.4pt}}
+    }
+
+
+\begin{document}
+
+    \input{titlepage.tex}
+
+    \frontmatter
+    
+    \newpage
+    \pagestyle{empty}
+    \begin{center}
+    \copyright{} 2021 Brian Edward Jackson \\
+    ALL RIGHTS RESERVED
+    \end{center}
+    
+    \chapter*{Abstract}
+    Many modern control methods, such as model-predictive control, rely heavily
+    on solving optimization problems in real time. In particular, the ability to
+    efficiently solve optimal control problems has enabled many of the recent
+    breakthroughs in achieving highly dynamic behaviors for complex robotic
+    systems. The high computational requirements of these algorithms demand novel
+    algorithms tailor-suited to meeting the tight requirements on runtime
+    performance, memory usage, reliability, and flexibility. This thesis
+    introduces a state-of-the-art algorithm for trajectory optimization that
+    leverages the problem structure while being applicable across a wide variety
+    of problem requirements, including those involving conic constraints and
+    non-Euclidean state vectors such as 3D rotations.
+
+    Building off of this existing work, we propose two novel research directions.
+    First, we propose a method for low-cost dynamics emulation of arbitrary
+    aerospace systems using multicopters, leveraging much of the work on online
+    trajectory optimization detailed in this thesis. Second, we propose to
+    further push the computational limits of nonlinear trajectory optimization
+    with algorithms that are more naturally suited to parallelization.
+
+    \tableofcontents
+    \listoffigures
+    \listoftables
+
+    \chapter*{Nomenclature}
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{l l}
+            Acronym & Definition \\
+            \midrule
+            QP   & Quadratic Program \\
+            SOCP & Second-Order Cone Program \\
+            DDP  & Differential Dynamic Programming \\
+            LQR  & Linear Quadratic Regulator \\
+            TVLQR & Time-Varying LQR \\
+            NLP  & Nonlinear Program \\
+            SQP  & Sequential Quadratic Programming \\
+            IPM  & Interior Point Methods \\
+            ALM  & Augmented Lagrangian Method \\
+            ADMM & Alternating Direction Method of Multipliers \\
+            MPC  & Model-Predictive Control \\
+            PCG  & Preconditioned Conjugate Gradient \\
+            SLAM & Simuntaneous Localization and Mapping \\
+    \end{tabular}
+    \caption{Table of Abbreviations}
+    \label{tab:abbreviations}
+    \end{table}
+    
+
+    \mainmatter
+    \pagestyle{fancy}
+    \subfile{chapters/01_intro.tex}
+
+    \subfile{chapters/02_background.tex}
+
+    \part{Theory and Algorithms} \label{part:theory}
+    \subfile{chapters/03_altro.tex}
+    \subfile{chapters/03_results.tex}
+
+    \subfile{chapters/04_mpc.tex}
+    \subfile{chapters/04_results.tex}
+
+    \subfile{chapters/05_attitude.tex}
+
+    \part{Application} \label{part:application}
+    \subfile{chapters/06_distributed.tex}
+
+    \part{Proposed Work} \label{part:proposal}
+    \subfile{chapters/07_blimp.tex}
+    \subfile{chapters/08_parallelization.tex}
+    \subfile{chapters/09_conclusion.tex}    
+
+    \appendix
+    \subfile{chapters/a1_quaternion_maps.tex}
+
+    \printbibliography
+    
+\end{document}

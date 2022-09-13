@@ -1,0 +1,246 @@
+\documentclass[../root.tex]{subfiles}
+
+\begin{document}
+\chapter{Quaternion Error Maps} \label{app:quaternion_error_maps}
+
+As detailed in Chapter \ref{chap:attitude}, when taking derivatives with
+respect to quaternions, we need to have a mapping from the non-singular space
+of unit quaternions to a local three-parameter representation, parameterizing
+the plane tangent to the quaternion hypersphere at the group identity. As
+mentioned in Sec. \ref{sec:Quaternion_Calculus}, there are several different
+mappings that have been proposed in the literature. In this appendix, we 
+provide more details about these mappings and show that, at the group identity,
+all these mappings result in the same Jacobians, allowing the results in Sec. 
+\ref{sec:Quaternion_Calculus} to apply regardless of the mapping used.
+
+\section{Forward and Inverse Maps} 
+
+Table \ref{tab:quat_error_maps} summarizes the four most common quaternion
+error maps. Note that these definitions may be slightly different due to some
+scaling parameters that have been added such that the derivatives in the
+following sections are all consistent. The exponential map was scaled by a
+factor of two while the MRP map was scaled by a factor of one half. Here we
+define the forward map to be the map that takes the three-parameter
+representation $\phi, g, p$, or $c$ and converts it back into a unit quaternion,
+while the inverse map does the opposite. For notational convenience, we
+define $s \in \R$ and $v \in \R^3$ to be the scalar and vector part of the
+unit quaternion.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{r l l}
+        Map & Forward & Inverse \\
+        \midrule
+        Exponential 
+            & $ \displaystyle q = \begin{bmatrix} \cos(\norm{\phi}) \\ \frac{\phi}{\norm{\phi}} \sin(\norm{\phi}) \end{bmatrix} $ 
+            & $ \displaystyle \phi = \frac{v}{\norm{v}} \, \text{atan2}(\norm{v}, s)  $ \\
+        Cayley
+            & $ \displaystyle q = \frac{1}{1 + \norm{g}^2} \begin{bmatrix} 1 \\ g \end{bmatrix} $ 
+            & $ \displaystyle g = \frac{v}{s} $ \\
+        MRP
+            & $ \displaystyle q = \frac{1}{1 + \norm{p}^2} \begin{bmatrix} 1 - \norm{p}^2 /4 \\ p \end{bmatrix} $
+            & $ \displaystyle p = \frac{2}{1+s} \, v$ \\
+        Vec
+            & $ \displaystyle q = \begin{bmatrix} \sqrt{1 - \norm{c}^2} \\ c \end{bmatrix} $ 
+            & $ \displaystyle c = v $
+    \end{tabular}
+    \caption{Basic quaternion error maps}
+    \label{tab:quat_error_maps}
+\end{table}
+
+\section{Forward Jacobian}
+As summarized in Sec. \ref{sec:quat_jacobian}, when taking the Jacobian of a function 
+$y = h(q) : \Q \mapsto \R^p$, we apply a differential rotation $\phi$ to the input and
+apply the chain rule:
+\begin{equation} \label{eq:quat_gradient2}
+    \nabla h(q) = \pdv{h}{q}  L(q) \pdv{\varphi}{\phi}
+\end{equation}
+Since $\phi$ is a differential rotation, we evaluate the Jacobian of the
+forward map $\varphi$ as $\phi \rightarrow 0$. In Sec. \ref{eq:quat_jacobian}
+we claimed that 
+\begin{equation} \label{eq:quat_forward_identity}
+    \lim_{\phi \rightarrow 0} \pdv{\varphi}{\phi} = H.
+\end{equation}
+We now prove that claim by deriving the Jacobians for the forward maps in
+Table \ref{tab:quat_error_maps}.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{r l}
+        Map & Forward Jacobian \\
+        \midrule
+        Exponential 
+            & $ \displaystyle \frac{1}{\norm{x}} \begin{bmatrix}
+                -\norm{x} \sin(\norm{x}) \\
+                (I - \frac{x x^T}{x^T x}) \sin(\norm{x}) + \frac{x x^T}{\norm{x}} \cos(\norm{x})
+            \end{bmatrix}  $ \\
+        Cayley 
+            & $ \displaystyle (1+\norm{g}^2)^{\sfrac{\text{-}3}{2}} \begin{bmatrix} -g^T \\ (1+\norm{g}^2)I - g g^T \end{bmatrix} $ \\
+        MRP 
+            & $ \displaystyle (1 + \norm{p}^2)^{\text{-}2} \begin{bmatrix} -p^T \\ (1+\frac{1}{4} \norm{p}^2) I - \half p p^T \end{bmatrix} $ \\
+        Vec 
+            % & $ \displaystyle \begin{bmatrix} -(1 - \norm{c}^2)^{\sfrac{\text{-}1}{2}} \, c^T \\ I \end{bmatrix} $
+            & $ \displaystyle \begin{bmatrix} \frac{-c^T}{\sqrt{1 - \norm{c}^2}} \\ I \end{bmatrix} $
+    \end{tabular}
+\end{table}
+For the Cayley, MPR, and Vec maps, the identity \eqref{eq:quat_forward_identity} can 
+be easily verified by plugging in $\zeros_3$ for $g$, $p$, and $c$, respectively.
+The exponential map, however, requires a slightly more careful analysis. Using small
+angle approximations, we can approximate the exponential map as 
+\begin{equation} \label{eq:expm_approx}
+    \begin{bmatrix}
+        1 - \half \norm{v}^2 \\ \frac{\phi}{\norm{\phi}} \norm{\phi}
+    \end{bmatrix} = \begin{bmatrix}
+        1 - \half \norm{v}^2 \\ \phi
+    \end{bmatrix}.
+\end{equation}
+The identity \eqref{eq:quat_forward_identity} can then be easily verified.
+
+\section{Inverse Jacobian}
+Similar to the forward Jacobian, when we take the Jacobian of a 
+function $q' = f(q) : \Q \rightarrow \Q$ as in Sec. \ref{sec:quatquat_jacobian}, we 
+apply a differential rotation to both the input and the output:
+\begin{equation}
+    f(q) \approx \pdv{}{\phi} \, \varphi^{-1}(L(q')^T f( L(q) \varphi(\phi)) \phi.
+\end{equation}
+We obtain the Jacobian by again applying the chain rule:
+\begin{equation}
+    \nabla f(q) = \pdv{\varphi^{-1}}{q} L(q')^T \pdv{f}{q} L(q) \pdv{\varphi}{\phi}.
+\end{equation}
+Note that as the differential value applied to the output goes to zero, the
+term inside the inverse map $\varphi^{-1}$ goes to the quaternion identity 
+$q_I = [1 \, 0 \, 0 \, 0]^T$ since $q' = f(q)$. Therefore, we only need to 
+evaluate the Jacobian of the inverse map at the quaternion identity. We claimed
+in Sec. \ref{sec:quatquat_jacobian} that 
+\begin{equation} \label{eq:quat_inv_identity}
+    \lim_{q \rightarrow q_I} \pdv{\varphi^{-1}}{q} = H^T.
+\end{equation}
+We now show that this is true for all of the maps in Table \ref{tab:quat_error_maps}
+by deriving the Jacobians of the inverse maps, shown in Table \ref{tab:quat_invjac}.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{r l}
+        Map & Inverse Jacobian \\
+        \midrule
+        Exponential 
+            & $ \displaystyle \frac{1}{(\norm{v}^2 + s^2)} \begin{bmatrix} 
+                -v & 
+                \frac{1}{\norm{v}}(\norm{v}^2 + s^2) (I - \frac{v v^T}{v^T v}) \text{atan2}(\norm{v}, s) + \frac{v v^T}{\norm{v}^2} s
+            \end{bmatrix} $ \\
+        Cayley 
+            & $ \displaystyle \begin{bmatrix}
+                -s^{-2} v & s^{-1} I
+            \end{bmatrix} $ \\
+        MRP 
+            & $ \displaystyle \frac{1}{(1+s^2)^2} \begin{bmatrix}
+                -v & (1+s) I
+            \end{bmatrix} $ \\
+        Vec
+            & $ \displaystyle \begin{bmatrix} \zeros_3 & I_3 \end{bmatrix}  $
+    \end{tabular}
+    \caption{Inverse Quaternion Error Map}
+    \label{tab:quat_invjac}
+\end{table}
+The identity \eqref{eq:quat_inv_identity} can again be easily verified for the Cayley,
+MRP, and Vec maps by plugging in $s=1, v=\zeros_3$. As before, the exponential map requires 
+a more careful analysis since plugging in $v=\zeros_3$ results in divisions by 0. Using the
+first two terms of the Taylor expansion of $\text{arctan}(x) = x - \frac{x^3}{3}$, we 
+get the following approximation for the inverse exponential map (also called the logarithmic
+map):
+\begin{equation}
+    \begin{aligned}
+        \varphi^{-1}_\text{exp}(\phi) &\approx \frac{v}{\norm{v}} 
+            \left(\frac{\norm{v}}{s} - \frac{\norm{v}^3}{3s^3} \right) \\
+        &= \frac{v}{s} \left(1 - \frac{\norm{v}^2}{3s^2} \right)
+    \end{aligned}
+\end{equation}
+Taking the Jacobian of this approximation gives $\pdv*{\varphi^{-1}}{q} =
+[\pdv*{}{s} \, \pdv*{v}]$, where
+\begin{subequations}
+    \begin{align}
+        \pdv*{}{s} &= \frac{v}{s^2} \left( \frac{3 \norm{v}^2}{3 s^2} - 1 \right) \\
+        \pdv*{}{v} &= \frac{1}{s}\left(1- \frac{\norm{v}^2}{3s^2} \right) I - \frac{2v v^T}{3s^3}
+    \end{align}
+\end{subequations}
+which, when evaluate at $s=1, v=\zeros_3$, gives $H^T$, as expected.
+
+
+\section{Second-Order Jacobian}
+Here we provide a little more detail on deriving \eqref{eq:quat_hessian} in 
+Sec. \ref{sec:quat_hessian}. Given a function $h(q) : \Q \mapsto \R$, we want 
+an expression for the Hessian of $h$. Equivalently, we want to take the 
+Jacobian of \eqref{eq:quat_gradient2}. Again applying the chain rule we get two
+separate terms:
+\begin{equation} \label{eq:quathess_chainrule}
+    \nabla^2 h(q) = \pdv{\varphi}{\phi}^T L(q)^T \pdv[2]{h}{q} L(q) \pdv{\varphi}{\phi}
+        + \pdv{}{\phi} \left( \pdv{\varphi}{\phi}^T L(q)^T \pdv{h}{q}^T \right)
+\end{equation}
+The second term is the second derivative of the forward map $\varphi$. To avoid 
+dealing directly with the rank-3 tensor, we instead derive analytic expressions 
+for Jacobians of the Jacobian-transpose-vector product:
+\begin{equation}
+    \nabla^2 \varphi(\phi, b) = \pdv{}{\phi} \left( \pdv{\varphi}{\phi}^T b \right).
+\end{equation}
+In Sec. \ref{sec:quat_hessian} we used the following identity, 
+\begin{equation}
+    \nabla^2 \varphi(\phi, b) = - w I_3
+\end{equation}
+where $w$ is the first element of the vector $b$. From
+\eqref{eq:quathess_chainrule} we see that the vector $b$ is equal to $L(q)^T
+\pdv{h}{q}^T$, where $\pdv{h}{q} \in \R^{1\times4}$ is the gradient with respect 
+to $q$, treating $q$ as a standard vector in $\R^4$. Examining the definition 
+of $L(q)$ in \eqref{eq:Lmult}, we see the first column is just $q$, so the 
+first element of the vector $b$ is simply $\pdv{h}{q} q$. We then obtain the 
+expression for the second term in \eqref{eq:quat_hessian}: $-(\pdv*{h}{q} q) I_3$.
+Since these second-order expressions are more involved, we derive them in the 
+subsections below. Again for notational clarity, we define $b = [w \; y^T]^T$, 
+where $w \in \R, y \in \R^3$ correspond to the scalar and vector parts of the 
+quaternion, $s$ and $v$.
+
+\subsection{Exponential Map}
+Since the full second-order expansion of the exponential map is complicated and 
+needs to be approximated anyways for the same reasons as the previous sections,
+we instead derive the second-order expansion for the small-angle approximation
+\eqref{eq:expm_approx}.
+
+\begin{equation}
+    \begin{aligned}
+        \nabla^2 \varphi_\text{exp}(\phi,b) &= \pdv{}{\phi} \left( -\phi w + y \right) \\
+        &= -w I_3
+    \end{aligned}
+\end{equation}
+
+\subsection{Cayley Map}
+The second-order term for the Cayley map is:
+\begin{equation} \label{eq:cayley_hess}
+    \nabla^2 \varphi_\text{cay}(g,b) = 
+        \left( 
+            \left( g w + (g g^T y - (1+g^T g) y) \right) \frac{3 g^T}{1+g^T g} - 
+            \left( I (w + g^T y) + g y^T - 2y g^T \right) 
+        \right) (1 + g^T g)^{-3/2}
+\end{equation}
+Evaluating this expression at $g = \zeros_3$ we get $-w I_3$.
+
+\subsection{MRP Map}
+The second-order term for the MRP map is:
+\begin{equation}
+    \nabla^2 \varphi_\text{mrp}(p,b) = 
+        \frac{1}{2(1 + \frac{1}{4}p^Tp)^3}
+        \left(
+            \left( 2p w + p p^T y - 2(1 + \frac{1}{4}p^Tp) \right) p^T - 
+            (1 + \frac{1}{4}p^Tp) \left( 2w I_3 + p'y I_3 + p y^T - y p^T \right)
+        \right).
+\end{equation}
+Which, when evaluated at $p = \zeros_3$, equals $-w I_3$.
+
+\subsection{Vec Map}
+The second-order term for the Vec map is:
+\begin{equation}
+    \nabla^2 \varphi_\text{vec}(p,b) = 
+    -\frac{w}{(1-c^T c)^{\sfrac{3}{2}}} \left( c c^T + (1-c^T c) I \right).
+\end{equation}
+Which evaluated at $c = \zeros_3$ also equals $-w I_3$.
+
+
+\end{document}

@@ -1,0 +1,98 @@
+\tikzstyle{state}=[circle,
+                                    thick,
+                                    minimum size=1.2cm,
+                                    draw=blue!80,
+                                    fill=blue!20]
+
+% The measurement vector is represented by an orange circle.
+\tikzstyle{measurement}=[circle,
+                                                thick,
+                                                minimum size=1.2cm,
+                                                draw=orange!80,
+                                                fill=orange!25]
+
+% The control input vector is represented by a purple circle.
+\tikzstyle{input}=[circle,
+                                    thick,
+                                    minimum size=1.2cm,
+                                    draw=purple!80,
+                                    fill=purple!20]
+
+% The input, state transition, and measurement matrices
+% are represented by gray squares.
+% They have a smaller minimal size for aesthetic reasons.
+\tikzstyle{matrx}=[rectangle,
+                                    thick,
+                                    minimum size=1cm,
+                                    draw=gray!80,
+                                    fill=gray!20]
+
+\tikzstyle{empty}=[rectangle,
+                                    thick,
+                                    minimum size=1cm,
+                                    fill=none]
+
+% The system and measurement noise are represented by yellow
+% circles with a "noisy" uneven circumference.
+% This requires the TikZ library "decorations.pathmorphing".
+\tikzstyle{noise}=[circle,
+                                    thick,
+                                    minimum size=1.2cm,
+                                    draw=yellow!85!black,
+                                    fill=yellow!40,
+                                    decorate,
+                                    decoration={random steps,
+                                                            segment length=2pt,
+                                                            amplitude=2pt}]
+
+% Everything is drawn on underlying gray rectangles with
+% rounded corners.
+\tikzstyle{background}=[rectangle,
+                                                fill=gray!10,
+                                                inner sep=0.2cm,
+                                                rounded corners=5mm]
+
+\begin{tikzpicture}[>=latex,text height=1.5ex,text depth=0.25ex]
+    % "text height" and "text depth" are required to vertically
+    % align the labels with and without indices.
+  
+  % The various elements are conveniently placed using a matrix:
+  \matrix[row sep=0.5cm,column sep=0.5cm] {
+    % First line: Control input
+        & &
+        \node (u1) [input]{$\mathbf{u}_{1}$}; &
+        &
+        \node (u2) [input]{$\mathbf{u}_{2}$}; &
+        \node (break) [empty] {}; &
+        &
+        \node (uterm) [input]{$\mathbf{u}_{N-1}$}; &
+        \\
+    % Second line: states and dynamics
+        \node (f1) [matrx] {$\mathbf{\lambda}_1$}; & 
+        \node (x1) [state] {$\mathbf{x}_1$}; & 
+        \node (f2) [matrx] {$\mathbf{\lambda}_2$}; & 
+        \node (x2) [state] {$\mathbf{x}_2$}; & 
+        \node (f3) [matrx] {$\mathbf{\lambda}_3$}; & 
+        \node (break) [empty] {\Large $\mathbf{\dots}$}; &
+        \node (xlast) [state] {$\mathbf{x}_{N-1}$}; &
+        \node (fterm) [matrx] {$\mathbf{\lambda}_N$}; & 
+        \node (xterm) [state] {$\mathbf{x}_{N}$}; 
+        \\
+    };
+
+    
+    % The diagram elements are now connected through arrows:
+    \path[->]
+        (f1) edge[thick] (x1)
+        (x1) edge[thick] (f2)
+        (f2) edge[thick] (x2)
+        (x2) edge[thick] (f3)
+        (f3) edge[thick] (break)
+        (break) edge[thick] (xlast)
+        (xlast) edge[thick] (fterm)
+        (fterm) edge[thick] (xterm)
+        (u1) edge[thick] (f2)
+        (u2) edge[thick] (f3)
+        (uterm) edge[thick] (fterm)
+    ;
+\end{tikzpicture}

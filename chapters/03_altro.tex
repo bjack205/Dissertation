@@ -1,0 +1,706 @@
+\documentclass[../root.tex]{subfiles}
+
+\begin{document}
+\chapter[ALTRO]{ALTRO: A Fast Solver for Constrained Trajectory Optimization} \label{chap:altro}
+\chaptermark{ALTRO}
+In this chapter we present the ALTRO solver, a new solver for constrained 
+nonlinear trajectory optimization that combines iLQR within an augmented 
+Lagrangian solver together with an active-set direct method for solution 
+polishing. The content and results in this chapter are based on the content
+originally published in \cite{howell_ALTRO_2019}. The timing results given 
+in this chapter are not representative of the current state of the ALTRO solver.
+See the next chapter and the open-source software 
+package\footnote{\url{https://github.com/RoboticExplorationLab/Altro.jl}} 
+for more representative timing results.
+
+\section{Introduction}
+
+\lettrine{A}{s} discused in Sec. \ref{sec:lit_review}, direct collocation and
+differential dynamic programming (DDP) are two of the most common methods for
+solving trajectory optimization problems, but have their own unique strengths
+and weaknesses. In summary, direct collocation methods for trajectory
+optimization parameterize both the states and controls as decision variables
+and solve \eqref{opt:discrete_trajopt} using general-purpose nonlinear
+programming (NLP) solvers such as SNOPT \cite{gill_SNOPT_2005} or Ipopt
+\cite{wachter_implementation_2006}, and tend to be versatile and robust. It
+is straight forward to provide an initial state trajectory to the solver in
+such methods, even if it is dynamically infeasible. Direct collocation with
+Hermite-Simpson integration is by far the most common direct collocation
+method, using third-order splines for the state trajectory and first-order
+hold on the controls \cite{hargraves_Direct_1987}.
+
+Alternatively, DDP-based methods leverage the structure of
+\eqref{opt:discrete_trajopt} to solve a sequence of smaller sub-problems using
+Dynamic Programming. These are anytime algorithms, meaning they are always
+strictly dynamically feasible, allowing state and input trajectories at any
+iteration to be used in a tracking controller. However, it is often difficult
+to find a suitable initial guess for the control trajectory. Historically,
+these methods have been considered less robust and less suitable for
+reasoning about general state and control constraints but tend to be fast and
+amenable to implementation in embedded systems. Of the many variants of DDP,
+the Gauss-Newton approximation, iterative LQR (iLQR), is by far the most common
+in the robotics community. 
+
+Several efforts have been made to incorporate constraints into DDP methods:
+Box constraints on control inputs \cite{tassa_Controllimited_2014} and stage-wise inequality
+constraints on the states \cite{xie_Differential_2017,lin_Differential_1991} 
+have been handled by solving a
+constrained quadratic program (QP) at each step of the backward pass. A
+projection method was devised that satisfies linearized terminal state and
+stage state-input constraints \cite{giftthaler_projection_2017}. Augmented Lagrangian
+methods (ALM) have been proposed \cite{plancher_Constrained_2017}, including hybrid
+approaches that also solve constrained QPs for stage state-input constraints
+\cite{lantoine_Hybrid_,lin_Differential_1991}. Mixed state-input constraints have also been
+handled using a penalty method \cite{farshidian_efficient_2017}.
+
+Of these methods, those leveraging ALM have shown promise, given the ease of
+implemenation, fast convergence, and the ability to handle generic state and
+control equality and inequality constraints \cite{plancher_Constrained_2017}. 
+However, this approach suffers from a few critical issues:
+\begin{enumerate}
+    \item Poor numerical conditioning
+    \item Poor ``tail'' convergence
+    \item Inability to provide an initial guess for the state trajectory.
+\end{enumerate}
+In this chapter we present ALTRO (Augmented Lagrangian TRajectory Optimizer), a
+trajectory optimization algorithm that addresses these issues by
+combining the best characteristics of
+both direct collocation and DDP methods, namely: speed, small problem size,
+numerical robustness, handling of general state and input constraints,
+anytime dynamic feasibility, and infeasible state trajectory initialization.
+Using iLQR in an augmented Lagrangian framework to handle general state and
+input constraints, we: 1) derive a numerically robust square-root formulation
+of the backward pass, 2) introduce a method for initializing an infeasible
+state trajectory, 3) formulate the minimum time problem, and 4) present an
+anytime projected Newton method for solution polishing.
+
+\section{Augmented Lagrangian DDP}
+
+Prior to describing the novel characteristics of ALTRO, we present the
+derivation for solving constrained trajectory optimization problems using
+differential dynamic programming and iterative LQR within an augmented
+Lagrangian framework (AL-DDP or AL-iLQR), similar to
+\cite{plancher_Constrained_2017}. The derivation proceeds very similarly to
+that of discrete LQR, as derived in Section \ref{sec:discrete_LQR}.
+
+The key idea of DDP is that at each iteration, all nonlinear constraints and
+objectives are approximated using first or second order Taylor series
+expansions so that the approximate functions, now operating on deviations
+about the nominal trajectory, can be solved using discrete LQR. This optimal
+feedback policy is computed during the ``backward pass'' (Algorithm
+\ref{alg:BP}), since the dynamic programming step begins at the tail of the
+trajectory, as in LQR. The optimal deviations are then applied to the nominal
+trajectory during a ``forward pass'' (Algorithm \ref{alg:FP}), using the
+optimal feedback policy during the forward simulation---also known as a
+rollout---of the dynamics.
+
+To handle constraints, we simply ``augment'' the cost function with the
+multiplier and penalty terms of the augmented Lagrangian, treating $\lambda$
+and $\rho$ as constants. After several iterations of DDP, the multipliers and
+penalty terms are updated, and the process is repeated. The algorithm is
+summarized in Algorithm \ref{alg:iLQR}. We now proceed with the formal
+derivation.
+
+\subsection{Backward Pass}
+
+    We first form the augmented Lagrangian of \eqref{opt:discrete_trajopt}:
+    \begin{equation}
+        \begin{aligned}
+            \mathcal{L}_A =& \ell_N(x_N) + \big(\lambda_N + \half c_N(x_N) I_{\rho,N} \big)^T c_N(x_N) \\
+            &+ \sum_{k=0}^{N-1} \left[ \ell_k(x_k,u_k,\Delta t) 
+             + \left( \lambda + \half I_{\rho,k} c_k(x_k,u_k) \right)^T c_k(x_k,u_k) 
+            % + \left(\mu + \half I_{\rho,k} h_k(x_k,u_k) 
+            \right] \\
+            =& \mathcal{L}_N(x_N,\lambda_N,\rho_N) + \sum_{k=0}^{N-1} \mathcal{L}_k(x_k,u_k,\lambda_k,\rho_k)
+        \end{aligned}
+    \end{equation}
+    where $\lambda_k \in \R^{p_k}$ is a Lagrange multiplier, $\rho_k \in
+    \R^{p_k}$ is a penalty weight, and $c_k = (g_k, h_k) \in \R^{p_k}$ is the
+    concatenated set of equality and inequality constraints with index sets
+    $\mathcal{E}_k$ and $\mathcal{I}_k$, respectively. $I_{\rho_k} \in \R^{p_k
+    \times p_k}$ is the penalty matrix defined similarly to \eqref{eq:penalty_matrix}:
+    \begin{equation}
+        I_{\rho_k} = \begin{cases}
+            0 & \text{if } h_k(x)_i < 0 \; \wedge \; i \in \mathcal{I}_k \; \wedge \; \mu_i = 0 \\
+            (\rho_k)_i & \text{otherwise}
+        \end{cases}
+    \end{equation}
+
+    We now define the cost-to-go and the action-value functions as before:
+    \begin{align}
+        V_N(x_N)|_{\lambda,\rho} &= \mathcal{L}_N(x_N,\lambda_N,\rho_N) \label{eq:term_ctg} \\
+        V_k(x_k)|_{\lambda,\rho} &= \min_{u_k}\{ \mathcal{L}_k(x_k,u_k,\lambda_k,\rho_k) 
+        + V_{k+1}(f(x_k,u_k,\Delta t))|_{\lambda,\rho}\}  \\
+        &= \min_{u_k} Q(x_k,u_k)|_{\lambda,\rho},
+    \end{align}
+    where $V_k(x)|_{\lambda, \rho}$ is the cost-to-go at time step $k$
+    evaluated with the Lagrange multipliers $\lambda$ and the penalty terms
+    $\rho$.
+
+    In order to make the dynamic programming step feasible, we take a
+    second-order Taylor series of the nonlinear cost-to-go
+    \begin{equation}
+        \delta V_k(x) \approx \half \delta x_k^T P_k \delta x_k + p_k^T \delta x_k
+    \end{equation}
+    where $P_k$ and $p_k$ are the Hessian and gradient of the cost-to-go at
+    time step $k$, respectively. It is important to note that by taking
+    Taylor series approximations, we have now switched to optimizing
+    deviations about the nominal state and control trajectory.
+
+    Similar to \eqref{eq:LQR_termcost}, we can trivially calculate the
+    cost-to-go at the terminal time step since there are no controls to
+    optimize:
+    \begin{align}
+        p_{N} &= (\ell_N)_x + (c_N)_x^T(\lambda + I_{\rho_N}c_N) \label{eq:term_ctg_grad_exp}\\
+        P_{N} &= (\ell_N)_{xx} + (c_N)^T_x I_{\rho_N} (c_N)_x \label{eq:term_ctg_hess_exp}.
+    \end{align}
+    which are simply the gradient and Hessian of \eqref{eq:term_ctg} with
+    respect to the states $x_N$.
+
+    The relationship between $\delta V_k$ and $\delta V_{k+1}$ is derived by
+    taking the second-order Taylor expansion of $Q_k$ with respect to the
+    state and control,
+    \begin{equation} \label{eq:Q_expansion}
+        \delta Q_k = \frac{1}{2}
+        \begin{bmatrix} \delta x_k \\ \delta u_k \\ \end{bmatrix}^T \!\!
+        \begin{bmatrix} 
+            Q_{xx} & Q_{xu} \\
+            Q_{ux} & Q_{uu} \\
+        \end{bmatrix}
+        \begin{bmatrix} \delta x_k \\ \delta u_k \\ \end{bmatrix} + 
+        \begin{bmatrix} Q_x \\ Q_u \\ \end{bmatrix}^T \!\!
+        \begin{bmatrix} \delta x_k \\ \delta u_k \\ \end{bmatrix}
+    \end{equation}
+    Dropping the time-step indices for notational clarity, the block matrices are,
+    \begin{subequations} \label{eq:Q_expansion_terms}
+    \begin{align}
+    Q_{xx} &= \ell_{xx} + A^T P^\prime A + c_x^T I_\rho c_x \label{Qxx_exp}\\
+    Q_{uu} &= \ell_{uu} + B^T P^\prime B + c_u^T I_\rho c_u \label{Quu_exp}\\
+    Q_{ux} &= \ell_{ux} + B^T P^\prime A + c_u^T I_\rho c_x \label{Qux_exp}\\
+    Q_x &= \ell_x + A^T p^\prime + c_x^T(\lambda + I_\rho c) \label{Qx_exp}\\
+    Q_u &= \ell_u + B^T p^\prime + c_u^T(\lambda + I_\rho c) \label{Qu_exp},
+    \end{align}
+    \end{subequations}
+    where $A = \partial f/\partial x|_{x_k,u_k}$, $B = \partial f/\partial
+    u|_{x_k,u_k}$, and $^\prime$ indicates variables at the $k+1$ time step.
+    It is in this step that we differentiate between DDP and iLQR. DDP
+    computes the full second-order expansion, which includes computations
+    with rank-3 tensors resulting from the vector-valued dynamics and general
+    constraints. iLQR computes these expansions only to first order, such
+    that the dynamics and constraints are both linear in the states and
+    controls, resulting in a Gauss-Newton approximation of the true Hessian.
+    While this lower accuracy expansion results in the need for more
+    iterations, these iterations are considerably less expensive to compute,
+    often resulting in a considerably faster overall convergence rate. The
+    value of including the full second-order information often depends on the
+    type of problem being solved, and there exist a variety of methods for
+    approximating the rank-3 tensor information without the need to
+    explicitly compute it. The motivation for the name ``iterative LQR''
+    should now be clear, as we see that by linearizing the dynamics we arrive
+    at a problem nearly identical to \eqref{opt:discrete_LQR}.
+
+    Minimizing \eqref{eq:Q_expansion} with respect to $\delta u_k$ gives a
+    correction to the control trajectory. The result is a feedforward term
+    $d_k$ and a linear feedback term $K_k \delta x_k$. Regularization is
+    added to ensure the invertibility of $Q_{uu}$:
+    \begin{equation} \label{eq:gains}
+        \delta u_k^* = -(Q_{uu} + \beta I)^{-1}(Q_{ux} \delta x_k + Q_u) \equiv K_k \delta x_k + d_k.
+    \end{equation}
+    Take a quick moment to note that this is almost exactly the same as
+    \eqref{eq:LQR_gain}, except we have now added some regularization to
+    handle poorly conditioned Hessians (since these now depend on the
+    expansion about the nominal trajectory) and now have a feedforward term,
+    which results from the linear terms in the expansion. We would see
+    similar terms appear in LQR if we included linear terms in the cost
+    function.
+
+    Substituting $\delta u_k^*$ back into (\ref{eq:Q_expansion}), a closed-form
+    expression for $p_k$, $P_k$, and the expected change in cost, $\Delta
+    V_k$, is found:
+    \begin{subequations} \label{eq:ctg_update}
+    \begin{align}
+    P_k &= Q_{xx} + K_k^T Q_{uu} K_k + K_k^T Q_{ux} + Q_{xu} K_k \label{eq:ctg_hess_gen}\\
+    p_k &= Q_x + K_k^T Q_{uu} d_k  + K_k^T Q_u + Q_{xu}d_k \label{eq:ctg_grad_gen}\\
+    \Delta V_k &= d_k^T Q_u + \frac{1}{2}d_k^T Q_{uu} d_k \label{eq:dV}.
+    \end{align}
+    \end{subequations}
+        
+    \begin{algorithm}
+    \begin{algorithmic}[1]
+    \caption{Backward Pass} \label{alg:BP}
+        \Function{BackwardPass}{$X,U$} 
+            \State $\Delta V \leftarrow 0$
+            \State $p_N,P_N \leftarrow \eqref{eq:term_ctg_grad_exp},\eqref{eq:term_ctg_hess_exp}$
+            \For{k=N-1:-1:0} 
+                \State $\delta Q \leftarrow$ \eqref{eq:Q_expansion}, \eqref{eq:Q_expansion_terms}
+                \If{$Q_{uu} \succ 0$}
+                    \State $K_k, d_k, \leftarrow \eqref{eq:gains}$
+                    \State $P_k, p_k, \Delta V_k \leftarrow $ \eqref{eq:ctg_update}
+                    \State $\Delta V \leftarrow \Delta V + \Delta V_k$
+                \Else
+                    \State Increase $\beta$ and go to line 3
+                \EndIf
+            \EndFor\\
+        \Return{$K, d, \Delta V$}
+    \EndFunction
+    \end{algorithmic}
+    \end{algorithm}
+
+
+
+\subsection{Forward Pass}
+    Now that we have computed the optimal feedback gains for each time step,
+    we now update the nominal trajectories by simulating forward the
+    dynamics. Since the initial state is fixed, the entire forward simulation
+    can be summarized by the following updates:
+    \begin{subequations} \label{eq:ilqr_linesearch}
+    \begin{align}
+        \delta x_k =& \bar{x}_k - x_k \\
+        \delta u_k =& K_k \delta x_k  + \alpha d_k \\
+        \bar{u}_k =& u_k + \delta u_k \\
+        \bar{x}_{k+1} =& f(\bar{x}_k, \bar{u}_k) 
+    \end{align}
+    \end{subequations}
+    where $\bar{x}_k$ and $\bar{u}_k$ are the updated nominal trajectories
+    and $0 \leq \alpha \leq 1$ is a scaling term.
+
+    \subsubsection{Line Search} As with all nonlinear optimization, a line
+    search along the descent direction is needed to ensure an adequate
+    reduction in cost. We employ a simple backtracking line search on the
+    feedforward term using the parameter $\alpha$. After applying equations
+    \eqref{eq:ilqr_linesearch} to get candidate state
+    and control trajectories, we compute the ratio of the actual decrease to
+    the expected decrease:
+    \begin{equation} \label{eq:ilqr_z}
+        z = \frac{J(X,U) - J(\bar{X},\bar{U})}{-\Delta V(\alpha)}
+    \end{equation}
+    where
+    \begin{equation}
+        \Delta V(\alpha) = \sum_{k=0}^{N-1} \alpha d_k^T Q_u + \alpha^2 \half d_k^T Q_{uu} d_k
+    \end{equation}
+    is the expected decrease in cost, computed using $\bar{d}_k =
+    \alpha d_k$ to compute \eqref{eq:dV} at each time step. This can be
+    computed very efficiently by storing the two terms in
+    \eqref{eq:dV} separately and then scaling them by $\alpha$ and $\alpha^2$
+    during the forward pass.
+
+    If $z$ lies within the interval $[\beta_1, \beta_2]$, usually
+    $[1e\text{-}4,10]$, we accept the candidate trajectories. If it does not,
+    we update the scaling parameter $\alpha = \gamma \alpha$, where $0 <
+    \gamma < 1$ is the backtracking scaling parameter. $\gamma = 0.5$ is
+    typical. Increasing the lower bound on the acceptance interval will
+    require that more significant progress is made during each
+    backward-forward pass iteration. Decreasing the upper bound will keep the
+    progress closer to the expected decrease. These values aren't changed
+    much in practice.
+
+    \subsubsection{Regularization} If the line search fails to make progress
+    after a certain number of iterations, or the cost ``blows up'' to exceed
+    some maximum threshold (can easily happen for highly nonlinear, unstable
+    dynamics) the forward pass is abandoned and the regularization term
+    $\beta$ is increased prior to starting the backward pass. Increasing the
+    regularization term makes the partial Hessian in
+    \eqref{eq:gains} more like the identity matrix, effectively ``steering''
+    the Newton (or Gauss-Newton) step direction towards the more naive
+    gradient descent direction, which tends to be more reliable when the
+    current iterate is far from the local optimum.
+
+    The regularization is also increased if the partial Hessian in
+    \eqref{eq:gains} looses rank during the backward pass. In this case, the
+    regularization term is increased and the backward pass is restarted from
+    the beginning. The regularization is only decreased after a successful
+    backward pass. The regularization scaling value is usually between 1.5
+    and 2.0.
+
+    \begin{algorithm}
+    \begin{algorithmic}[1]
+    \caption{Forward Pass} \label{alg:FP}
+    \Function{ForwardPass}{$X,U,K,d,\Delta V,J$} 
+        \State Initialize $\bar{x}_0 = x_0$, $\alpha = 1$, $J^{-} \leftarrow J$
+        \For{k=0:1:N-1}
+            \State $\bar{u}_k = u_k + K_k(\bar{x}_k - x_k) + \alpha d_k$
+            \State $\bar{x}_{k+1} \leftarrow$ $f(\bar{x}_k, \bar{u}_k, \Delta t)$
+        \EndFor
+        \State $J \leftarrow$ Using $X, U$
+        \If{$J$ satisfies line search conditions}
+            \State $X \leftarrow \bar{X}, U \leftarrow \bar{U}$
+        \Else
+            \State Reduce $\alpha$ and go to line 3
+        \EndIf\\
+        \Return $X,U,J$
+    \EndFunction
+    \end{algorithmic}
+    \end{algorithm}
+
+
+\subsection{Termination Conditions} \label{term_conditions}
+The ``inner'' DDP/iLQR solve is run until one of the following termination
+conditions is met:
+\begin{itemize}
+    \item The cost decrease between iterations $J_\text{prev} - J$ is less
+    than some intermediate tolerance, $\epsilon_\text{intermediate}$. This is
+    the typical exit criteria.
+    \item The feedforward gains go to zero. We compute the average maximum of
+    the normalized gains:
+        \begin{equation} \label{eq:ilqr_grad}
+            \nabla_\text{ilqr} = \frac{1}{N-1} \sum_{k=0}^{N-1} \frac{\norm{d_k}_\infty}{\abs{U_k}+1}   
+        \end{equation}
+    \item The solver hits a maximum number of iterations,
+    $i^\text{max}_\text{ilqr}$
+\end{itemize}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\caption{Iterative LQR} \label{alg:iLQR}
+\State Initialize $x_0, U, \text{tolerance}$
+\State $X \leftarrow$ Simulate from $x_0$ using $U$, discrete dynamics
+\Function{iLQR}{$X, U$}
+    \State $J \leftarrow$ Using $X, U$
+    \Do
+        \State $J^{-} \leftarrow J$
+        \State $K,d, \Delta V \leftarrow \textproc{BackwardPass}(X,U)$
+        \State $X, U, J \leftarrow \textproc{ForwardPass}(X,U,K,d,\Delta V,J^{-})$
+    \doWhile{$|J - J^{-}| > \text{tolerance}$} \\
+    \Return $X,U,J$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Augmented Lagrangian Update}
+    Once the inner solve hits one of the termination conditions listed in section
+    \ref{term_conditions}, the dual variables are updated according to,
+    \begin{equation} \label{eq:dual_update}
+        \lambda_{k_i}^{+} = \begin{cases}
+        \lambda_{k_i} + \rho_{k_i} c_{k_i}(x_k^*,u_k^*) & i \in \mathcal{E}_k \\
+        \max (0,\lambda_{k_i} + \rho_{k_i} c_{k_i}(x_k^*,u_k^*)) & i \in \mathcal{I}_k,
+        \end{cases}
+    \end{equation} 
+    and the penalty is increased monotonically according to the schedule,
+    \begin{equation} \label{eq:penalty_update}
+        \rho_{k_i}^+ = \phi \rho_{k_i},
+    \end{equation}
+    where $\phi > 1$ is a scaling factor.
+
+    After experimenting with various different heuristic schemes for updating
+    the multipliers and the penalty parameters, we have found that the most
+    naive approach, that is updating them every outer loop iteration, is by
+    far the most reliable approach. It's possible that better performance may
+    be achieved by skipping penalty updates, or only updating some of penalty
+    parameters (e.g. the ones corresponding to active constraints), but we
+    found that the most basic approach works the best on the largest variety
+    of problems.
+
+\subsection{Hyperparameters}
+For convenience, we summarize all the hyperparameters in AL-iLQR, splitting them between those used for the inner unconstrained iLQR solve and those used by the outer Augmented Lagrangian solver.
+
+    \begin{landscape}
+        
+    \begin{table*}
+        \small
+		\centering
+		\caption{iLQR Hyperparameters}
+		\begin{tabular}{lllll}
+			\toprule
+			\textbf{Symbol} & \textbf{Name} & \textbf{Description} & \textbf{Typical Value(s)} & \textbf{Importance} \\
+			\midrule
+			$\epsilon_\text{cost}$ & Cost tolerance & Convergenced when difference in cost between iterations $< \epsilon_\text{cost}$ & $[1\text{e-}2,1\text{e-}4,1\text{e-}8]$ & High \\
+			$\epsilon_\text{grad}^\text{ilqr}$ & Gradient tolerance & Converged when $\nabla_\text{ilqr} < \epsilon_\text{grad}^{ilqr}$ & $1\text{e-}5$ & Med \\
+			$i_\text{max}^{lqr}$ & Max iterations & Maximum number of backward/forward pass iterations & [50,500] & Med \\
+			$\beta_1$ & Line search l.b. & Lower bound criteria for \eqref{eq:ilqr_z}. $\uparrow$ requires more progress be made & [1\text{e-}10,1\text{e-}8,1\text{e-}1] & Low \\
+			$\beta_2$ & Line search u.b. & Upper bound criteria for \eqref{eq:ilqr_z}. $\downarrow$ requires progress match expected & [1,10,20] & Low \\
+			$i_\text{max}^\text{ls}$ & Line search iterations & Maximum number of backtracking line search iterations & $[5,10,20]$ & Low \\
+			$\rho_\text{init}$ & Initial regularization & Initial value for regularization of $Q_{zz}$ in backward pass & 0 & Low \\
+			$\rho_\text{max}$ & Max regularization & Any further increases will saturate. $\downarrow$ allows for less aggressive regularization & 1e-8 & Low \\
+			$\rho_\text{min}$ & Min regularization & Any regularization below will round to 0. & 1e-8 & Low \\
+			$\phi_\rho$ & Reg. scaling & How much regularization is increased/decreased & (1,1.6,10) & Low \\
+			$J_\text{max}$ & Max cost & Maximum cost allowed during rollout & 1e8 & Med \\
+			\toprule
+		\end{tabular}
+		\label{tab:ilqr_params}
+	\end{table*}
+	
+	\begin{table*}
+        \small
+		\centering
+		\caption{Augmented Lagrangian Hyperparameters}
+		\begin{tabular}{llp{9cm}ll}
+			\toprule
+			\textbf{Symbol} & \textbf{Name} & \textbf{Description} & \textbf{Typical Value(s)} & \textbf{Importance} \\
+			\midrule
+			$\epsilon_\text{cost}$ & Cost tolerance & Converged when difference in cost between iterations < $\epsilon_\text{cost}$ & [1e2,1e-4,1e-8] & High \\
+			$\epsilon_\text{uncon}$ & iLQR cost tolerance & Cost tolerance for intermediate iLQR solves. $\downarrow$ can speed up overall convergence by requiring less optimality at each inner solve, resulting in more frequent dual updates. & [1e-1,1e-3,1e-8] & High \\
+			
+			$c_\text{max}$ & Constraint tolerance & Convergence when maximum constraint violation $< c_\text{max}$ & [1e-2,1e-4,1e-8] & High \\
+			
+			$i_\text{max}^{outer}$ & Outer loop iterations & Maximum number of outer loop updates & [10,30,100] & Med \\
+			
+			$\mu_\text{max}$ & Max penalty & $\uparrow$ allows for more outer loop iterations with good convergence, but may result in poor conditioning. $\downarrow$ may avoid ill-conditioning & 1e-8 & Low \\
+			
+			$\phi_\rho$ & Penalty scaling & $\uparrow$ Increases penalty faster, potentially converges faster, but will eventually fail to converge if too high & (1,10,100] & Med \\
+			
+			$\mu_\text{init}$ & Initial penalty & $\uparrow$ more likely to remain feasible and find a feasible solution faster. $\downarrow$ makes the initial problem appear unconstrained, which may be an ideal initial guess for constrained problem. & [1e-4,1,100] & Very High \\
+			
+			\toprule
+		\end{tabular}
+		\label{tab:al_params}
+	\end{table*}
+    \end{landscape}
+
+
+\section{The ALTRO Algorithm} 
+
+ALTRO (Algorithm \ref{alg:altro}) comprises two
+stages: The first stage solves \eqref{opt:discrete_trajopt} rapidly to a
+coarse tolerance using iLQR to solve the unconstrained sub-problems within
+the AL framework, following the approach outlined in the previous section.
+The optional secondary stage uses the coarse solution from the first stage to
+warm start an active-set Newton method that achieves high-precision
+constraint satisfaction. We present several refinements and extensions to
+constrained iLQR, as well as the novel projected Newton stage for ``solution
+polishing.''
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\caption{ALTRO} \label{alg:altro}
+\Procedure{}{}
+\State Initialize $x_0, U, \text{tolerances}; \tilde{X}$
+\If{Infeasible Start}
+\State $X \leftarrow \tilde{X}$, $s_{0:N{-}1} \leftarrow$ from \eqref{infeasible_controls}
+\Else 
+\State $X \leftarrow$ Simulate from $x_0$ using $U$
+\EndIf
+\State $X,U,\lambda \leftarrow \textproc{AL-iLQR}(X,U,\text{tol}.)$
+\State $(X,U,\lambda) \leftarrow \textproc{Projection}((X,U,\lambda),\text{tol}.)$ \\
+\Return $X,U$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Square Root Backward Pass}
+Augmented Lagrangian methods make rapid convergence on constraint
+satisfaction, but only as long as the penalty terms are updated at every
+outer loop iteration. This can quickly lead to very large penalty parameters,
+resulting in severe numerical ill-conditioning. To help mitigate this issue
+and make AL-iLQR more numerically robust we derive a square-root backward
+pass inspired by the square-root Kalman filter.
+
+\subsubsection{Background}
+To begin, we provide some background on matrix square-roots. The Cholesky
+factorization of a square positive-definite matrix $G$ factors the matrix
+into two upper-triangular matrices $G = U^T U$, where the upper-triangular
+matrix factor $U$ can be considered a ``square root'' of the matrix $G$. We
+denote this matrix square root as $U = \sqrt{G}$.
+
+Also in terms of background, the \textproc{QR} factorization $F = QR$ returns
+an upper-triangular matrix $R$ and an orthogonal matrix $Q$.
+
+We now seek a method for computing $\sqrt{A+B}$ in terms of $\sqrt{A}$ and
+$\sqrt{B}$, where $A,B \in \R^{n \times n}$ are square positive-definite
+matrices. We begin by noting that
+\begin{equation}
+    A + B = \begin{bmatrix} \sqrt{A}^T & \sqrt{B}^T \end{bmatrix} 
+    \begin{bmatrix} \sqrt{A} \\ \sqrt{B} \end{bmatrix} = F^T F
+\end{equation}
+where $F \in \R^{2n \times n}$. Taking the \textproc{QR} factorization of $F$ we get
+\begin{equation}
+\begin{aligned}
+    A+B =& F^T F \\
+        =& R^T Q^T Q R \\
+        =& R^T R
+\end{aligned}
+\end{equation}
+since $Q^T Q = I$ given that $Q$ is an orthogonal matrix. Therefore we have
+that $R = \sqrt{A+B}$ since $R$ is upper-triangular. We use
+$\textproc{QR}_R(\cdot)$ to denote the operation of taking the
+$\textproc{QR}$ factorization of the argument and returning the
+upper-triangular factor.
+
+The related equation $\sqrt{A-B}$ can be computed using successive rank-one
+downdates of $\sqrt{A}$ using the rows of $\sqrt{B}$. We denote this
+operation as $\textproc{DownDate}(\sqrt{A},\sqrt{B}$).
+
+\subsubsection{Derivation}
+The ill-conditioning of the backward pass is most significant in the Hessian of
+the cost-to-go, $P_k$. Our objective is to find an algorithm that only stores
+the square root of this matrix and never calculates it explicitly.
+
+We begin by calculating the square root of the terminal cost-to-go:
+\begin{equation}
+    \sqrt{P}_N = \textproc{QR}_R \bigg(\begin{bmatrix} (\ell_N)_xx \\ I_{\rho_N} c_N \end{bmatrix}\bigg)
+\end{equation}
+
+All that is left is to find $\sqrt{P}_k$ as an expression in terms of
+$\sqrt{P}_{k+1}$. We start by finding the square roots of $Q_{xx}$ and
+$Q_{uu}$:
+\begin{align} 
+	Z_{xx} = \sqrt{Q_{xx}} &\leftarrow \textproc{QR}_R \left( 
+		\begin{bmatrix} \sqrt{\ell_{xx}} \\ S^{'} A \\ \sqrt{I_\rho} c_x  \end{bmatrix} \right) \label{Qxx_sqrt} \\
+    Z_{uu} = \sqrt{Q_{uu}} &\leftarrow \textproc{QR}_R \left(
+    	\begin{bmatrix} \sqrt{\ell_{uu}} \\ S^{'} B \\ \sqrt{I_\rho} c_u \\
+    	\sqrt{\rho} I \end{bmatrix} \label{Quu_sqrt} \right).
+\end{align}
+
+The optimal gains are then trivially computed as
+\begin{equation} \label{sqrt_K}
+	K = -Z_{uu}^{-1} Z_{uu}^{-T} Q_{ux}
+\end{equation}
+\begin{equation} \label{sqrt_d}
+	d = -Z_{uu}^{-1} Z_{uu}^{-T}Q_u,
+\end{equation}
+Here it's important to note that these equations should be computed using a
+linear solver (e.g. the ``$\backslash$'' operator in MATLAB or Julia)
+sequentially, since these equations are trivially computed using backward or
+forward substitution, given that the square root factors are triangular.
+
+The gradient \eqref{eq:ctg_grad_gen} and change of the cost-to-go
+\eqref{eq:dV} are also computed with simple substitution:
+\begin{equation}
+	p = Q_x + (Z_{uu}K)^T(Z_{uu}d) + K^T Q_u + Q_{xu}d \label{ctg_grad_sqrt}
+\end{equation}
+\begin{equation}
+    \Delta V = d^T Q_u + \frac{1}{2}(Z_{uu}d)^T (Z_{uu}d) \label{dV_sqrt}.
+\end{equation}
+
+We note that \eqref{eq:ctg_hess_gen} is a quadratic form that can be expressed as
+\begin{equation}
+\begin{aligned}
+    P &= \begin{bmatrix} I \\ K \end{bmatrix}^T 
+          \begin{bmatrix} Q_{xx} & Q_{ux}^T \\ Q_{ux} & Q_{uu} \end{bmatrix}
+          \begin{bmatrix} I \\ K \end{bmatrix} \\
+    P &= \begin{bmatrix} I \\ K \end{bmatrix}^T 
+      \begin{bmatrix} Z_{xx}^T & 0\\ C^T & D^T \end{bmatrix}\begin{bmatrix} Z_{xx} & C \\ 0 & D \end{bmatrix}
+      \begin{bmatrix} I \\ K \end{bmatrix} \\
+      &= \begin{bmatrix} Z_{xx} + C K \\ D K \end{bmatrix}^T 
+         \begin{bmatrix} Z_{xx} + C K \\ D K \end{bmatrix} \\
+\end{aligned}
+\end{equation}
+where,
+\begin{align}
+    C &= Z_{xx}^{-T} Q_{xu} \\
+    D &= \sqrt{Z_{uu}^T Z_{uu} - Q_{ux} Z_{xx}^{-1} Z_{xx}^{-T} Q_{xu}} \\
+      &= \textproc{DownDate}\left(Z_{uu}, Z_{xx}^{-T} Q_{xu} \right).
+\end{align}
+
+The square root of $P_k$ is then
+\begin{equation}
+    \sqrt{P}_k = \textproc{QR}_R \left( \begin{bmatrix} Z_{uu} + Z_{xx}^{-T} Q_{xu} K \\
+    \textproc{DownDate}\left(Z_{uu}, Z_{xx}^{-T} Q_{xu} \right) \! \cdot \! K \end{bmatrix} \right)
+\end{equation}
+
+
+
+\subsection{Infeasible State Trajectory Initialization}
+    Desired state trajectories can often be identified (e.g., from sampling-based
+    planners or expert knowledge), whereas finding a control trajectory that will
+    produce this result is usually challenging. Dynamically infeasible state
+    trajectory initialization is enabled by introducing additional inputs to the
+    dynamics with slack controls $s \in \R^{n}$,
+    \begin{equation}
+        x_{k+1} = f(x_k,u_k) + s_k \label{eq:inf_dyn},
+    \end{equation}
+    to make the system artificially fully actuated. 
+
+    Given initial state and control trajectories, $\tilde{X}$ and $U$, the
+    initial infeasible controls $s_{0:N-1}$ are computed as the difference
+    between the dynamics and desired state trajectory at each time step:
+    \begin{align}
+        s_k = \tilde{x}_{k+1} - f(\tilde{x}_k,u_k) \label{infeasible_controls}
+    \end{align}
+    The optimization problem \eqref{opt:discrete_trajopt} is modified by
+    replacing the dynamics with \eqref{eq:inf_dyn}. An additional cost term,
+    \begin{align}
+        \sum_{k=0}^{N-1}\frac{1}{2}s_k^T R_s s_k \label{eq:inf_cost},
+    \end{align}
+    and constraints $s_k = 0, \; k \in \mathbb{N}_{N-1} \label{eq:inf_con}$ are also
+    added to the problem. Since $s_k = 0$ at convergence, a dynamically feasible
+    solution to (\ref{opt:discrete_trajopt}) is still obtained.
+
+    \subsection{Minimum Time}
+    Minimum time problems can be solved by considering $\tau = \sqrt{dt} \in
+    \R$ as an input at each time step, $\mathrm{T} =
+    \{\tau_0,\dots,\tau_{N-1}\}$. The optimization problem
+    \eqref{opt:discrete_trajopt} is modified to use dynamics,
+    \begin{equation}
+        \begin{bmatrix} x_{k+1} \\ \omega_{k+1} \end{bmatrix} = \begin{bmatrix} f(x_k,u_k,\tau_k) \\ \tau_k \end{bmatrix} \label{min_time_dyn},
+    \end{equation}
+    with an additional cost,
+    \begin{align}
+        \sum_{k=0}^{N-1} R_{\text{min}}\tau_k^2 \label{min_time_cost},
+    \end{align}
+    and constraints $\omega_k= \tau_k, \; k{=}1,\dots,N{-}1$ to ensure time
+    steps are equal so the solver does not exploit discretization errors in
+    the system dynamics. Upper and lower bounds can also be placed on
+    $\tau_k$.
+
+    \subsection{Solution Polishing}
+    Augmented Lagrangian methods only make good progress on constraints as
+    long as the penalty terms are updated. However, the penalties can only be
+    updated a finite number of times before the penalties result in severe
+    ill-conditioning, as discussed previously. As a result, augmented
+    Lagrangian methods suffer from slow ``tail'' convergence, or convergence
+    near the optimal solution. Active-set methods, on the other hand, exhibit
+    quadratic convergence near the optimal solution. We present an active-set
+    projection method to rapidly converge on the constraints once the
+    convergence of AL-iLQR slows down.
+
+    This final solution polishing method solves the following optimization problem:
+    \begin{mini}[2]
+        {\delta z}{\delta z^T H \delta z}{}{}
+        \addConstraint{D \delta z}{= d}
+    \end{mini}
+    where $z \in \R^{Nn \times (N-1)m}$ is the concatenated vector of the
+    states and controls at all time steps, $H$ is the Hessian of the cost,
+    and $D,d$ are the linearized active constraints. Constraints are
+    considered active if the constraint violation is less than some small
+    positive value $\epsilon_\text{constraint}$.
+
+    This problem essentially projects the solution from AL-iLQR onto the
+    constraint manifold, while minimizing impact to the cost. Algorithm
+    \ref{alg:projection} takes successive Newton steps $\delta z$, only
+    updating the constraint Jacobian $D$ when the convergence rate $r$ drops
+    below a threshold, allowing re-use of the same matrix factorization $S$
+    for inexpensive linear system solutions. Further, this algorithm can be
+    implemented in a sequential manner~\cite{rao_Application_1998} that does not require
+    building large matrices, making it amenable to embedded systems.
+
+    \begin{algorithm}
+        \begin{algorithmic}[1]
+            \caption{Projection} \label{alg:projection}
+            \Function{Projection}{$Y,\text{tol.}$}
+            \State $H^{-1} \leftarrow$ invert Hessian of objective
+
+            \While {$\norm{d}_\infty > \text{tol.}$}
+                \State $d, D \leftarrow$ linearize active constraints
+                \State $S \leftarrow \sqrt{D H^{-1} D^T}$
+                \State $v \leftarrow \norm{d}_\infty$
+                \State $r \leftarrow \infty$
+                \While {$v  > \text{tol.}$ and $r > \text{conv. rate tol.}$}
+                    \State $Y,v^+ \leftarrow \textproc{LineSearch}(Y,S,H^{-1},D,d,v)$
+                    \State $r \leftarrow \log{v^+}/\log{v}$
+                \EndWhile
+            \EndWhile \\
+            \Return $Y$
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+    \begin{algorithm}
+        \begin{algorithmic}[1]
+            \caption{Projection Line Search} \label{alg:pn_linesearch}
+            \Function{LineSearch}{$Y,S,H^{-1},D,d,v_0$}
+            \State Initialize $\alpha, \gamma$
+            \While{$v > v_0$}
+                \State $\delta Y_p \leftarrow H^{-1} D^T (S^{-1}S^{-T} d)$
+                \State $\bar{Y}_p \leftarrow Y_p + \alpha \delta Y_p$
+                \State $d \leftarrow \textproc{UpdateConstraints}(\bar{Y}_p)$
+                \State $v \leftarrow \norm{d}_\infty$
+                \State $\alpha \leftarrow \gamma \alpha$
+            \EndWhile \\
+            \Return $\bar{Y}, v$
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+
+\end{document}
+
