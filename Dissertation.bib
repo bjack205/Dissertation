@@ -59,7 +59,7 @@
   doi = {10.1109/TCST.2012.2237346},
   abstract = {Planetary soft landing is one of the benchmark problems of optimal control theory and is gaining renewed interest due to the increased focus on the exploration of planets in the solar system, such as Mars. The soft landing problem with all relevant constraints can be posed as a finite-horizon optimal control problem with state and control constraints. The real-time generation of fuel-optimal paths to a prescribed location on a planet's surface is a challenging problem due to the constraints on the fuel, the control inputs, and the states. The main difficulty in solving this constrained problem is the existence of nonconvex constraints on the control input, which are due to a nonzero lower bound on the control input magnitude and a nonconvex constraint on its direction. This paper introduces a convexification of the control constraints that is proven to be lossless; i.e., an optimal solution of the soft landing problem can be obtained via solution of the proposed convex relaxation of the problem. The lossless convexification enables the use of interior point methods of convex optimization to obtain optimal solutions of the original nonconvex optimal control problem.},
   eventtitle = {{{IEEE Transactions}} on {{Control Systems Technology}}},
-  keywords = {Algorithm design and analysis,Benchmark testing,Convex functions,Convex optimization,convexification,interior point method algorithms,optimal control,Optimal control,Optimization,planetary soft landing,Space exploration},
+  keywords = {Algorithm design and analysis,Benchmark testing,Convex functions,Convex optimization,convexification,Convexification,interior point method algorithms,Interior point method algorithms,optimal control,Optimal control,Optimization,planetary soft landing,Planetary soft landing,Space exploration},
   file = {/home/brian/Zotero/storage/3D7ANMCB/Açıkmeşe et al. - 2013 - Lossless Convexification of Nonconvex Control Boun.pdf}
 }
 
@@ -273,7 +273,8 @@
   author = {Baraff, David},
   date = {1996},
   pages = {137--146},
-  publisher = {{ACM}}
+  publisher = {{ACM}},
+  file = {/home/brian/Zotero/storage/K9UPXGKA/Baraff - 1996 - Linear-time dynamics using Lagrange multipliers.pdf}
 }
 
 @article{bellantoni_Square_1967,
@@ -381,6 +382,18 @@
   file = {/home/brian/Zotero/storage/68RTS3AA/Betts and Huffman - 1991 - Trajectory optimization on a parallel processor.pdf}
 }
 
+@article{bjelonic_WholeBody_2021,
+  title = {Whole-{{Body MPC}} and {{Online Gait Sequence Generation}} for {{Wheeled-Legged Robots}}},
+  author = {Bjelonic, Marko and Grandia, Ruben and Harley, Oliver and Galliard, Cla and Zimmermann, Samuel and Hutter, Marco},
+  date = {2021},
+  journaltitle = {IEEE International Conference on Intelligent Robots and Systems},
+  pages = {8388--8395},
+  publisher = {{Institute of Electrical and Electronics Engineers Inc.}},
+  issn = {9781665417143},
+  doi = {10.1109/IROS51168.2021.9636371},
+  abstract = {Our paper proposes a model predictive controller as a single-task formulation that simultaneously optimizes wheel and torso motions. This online joint velocity and ground reaction force optimization integrates a kinodynamic model of a wheeled quadrupedal robot. It defines the single rigid body dynamics along with the robot's kinematics while treating the wheels as moving ground contacts. With this approach, we can accurately capture the robot's rolling constraint and dynamics, enabling automatic discovery of hybrid maneuvers without needless motion heuristics. The formulation's generality through the simultaneous optimization over the robot's whole-body variables allows for a single set of parameters and makes online gait sequence adaptation possible. Aperiodic gait sequences are automatically found through kinematic leg utilities without the need for predefined contact and lift-off timings, reducing the cost of transport by up to 85 \%. Our experiments demonstrate dynamic motions on a quadrupedal robot with non-steerable wheels in challenging indoor and outdoor environments. The paper's findings contribute to evaluating a decomposed, i.e., sequential optimization of wheel and torso motion, and single-task motion planner with a novel quantity, the prediction error, which describes how well a receding horizon planner can predict the robot's future state. To this end, we report an improvement of up to 71 \% using our proposed single-task approach, making fast locomotion feasible and revealing wheeled-legged robots' full potential.}
+}
+
 @article{blackmore_Autonomous_2016,
   title = {Autonomous {{Precision Landing}} of {{Space Rockets}}},
   author = {Blackmore, Lars},
@@ -480,6 +493,25 @@
   file = {/home/brian/Zotero/storage/SEQ6P5P3/Bolz et al. - 2003 - Sparse matrix solvers on the GPU conjugate gradie.pdf}
 }
 
+@inproceedings{bonalli_GuSTO_2019,
+  title = {{{GuSTO}}: {{Guaranteed Sequential Trajectory}} Optimization via {{Sequential Convex Programming}}},
+  shorttitle = {{{GuSTO}}},
+  booktitle = {2019 {{International Conference}} on {{Robotics}} and {{Automation}} ({{ICRA}})},
+  author = {Bonalli, Riccardo and Cauligi, Abhishek and Bylard, Andrew and Pavone, Marco},
+  date = {2019-05},
+  pages = {6741--6747},
+  publisher = {{IEEE}},
+  location = {{Montreal, QC, Canada}},
+  doi = {10.1109/ICRA.2019.8794205},
+  url = {https://ieeexplore.ieee.org/document/8794205/},
+  urldate = {2020-05-22},
+  abstract = {Sequential Convex Programming (SCP) has recently seen a surge of interest as a tool for trajectory optimization. Yet, most available methods lack rigorous performance guarantees and are often tailored to specific optimal control setups. In this paper, we present GuSTO (Guaranteed Sequential Trajectory Optimization), an algorithmic framework to solve trajectory optimization problems for control-affine systems with drift. GuSTO generalizes earlier SCP-based methods for trajectory optimization (by addressing, for example, goal region constraints and problems with either fixed or free final time), and enjoys theoretical convergence guarantees in terms of convergence to, at least, a stationary point. The theoretical analysis is further leveraged to devise an accelerated implementation of GuSTO, which originally infuses ideas from indirect optimal control into an SCP context. Numerical experiments on a variety of trajectory optimization setups show that GuSTO generally outperforms current state-of-the-art approaches in terms of success rates, solution quality, and computation times.},
+  eventtitle = {2019 {{International Conference}} on {{Robotics}} and {{Automation}} ({{ICRA}})},
+  isbn = {978-1-5386-6027-0},
+  langid = {english},
+  file = {/home/brian/Zotero/storage/FXEMQCGJ/Bonalli et al. - 2019 - GuSTO Guaranteed Sequential Trajectory optimizati.pdf}
+}
+
 @book{boyd_Convex_2004,
   title = {Convex {{Optimization}}},
   author = {Boyd, Stephen and Vandenberghe, Lieven},
@@ -488,15 +520,17 @@
   file = {/home/brian/Zotero/storage/I65BB6BW/Boyd,Vandenberghe (2004) Convex Optimization.pdf}
 }
 
-@article{boyd_Distributed_2011,
+@article{boyd_Distributed_2010,
   title = {Distributed Optimization and Statistical Learning via the Alternating Direction Method of Multipliers},
-  author = {Boyd, Stephen and Parikh, Neal and Chu, Eric and Peleato, Borja and Eckstein, Jonathan and others},
-  date = {2011},
-  journaltitle = {Foundations and Trends® in Machine learning},
+  author = {Boyd, Stephen and Parikh, Neal and Chu, Eric and Peleato, Borja and Eckstein, Jonathan},
+  date = {2010},
+  journaltitle = {Foundations and Trends in Machine Learning},
   volume = {3},
   number = {1},
   pages = {1--122},
-  publisher = {{Now Publishers, Inc.}}
+  doi = {10.1561/2200000016},
+  abstract = {Many problems of recent interest in statistics and machine learning can be posed in the framework of convex optimization. Due to the explosion in size and complexity of modern datasets, it is increasingly important to be able to solve problems with a very large number of features or training examples. As a result, both the decentralized collection or storage of these datasets as well as accompanying distributed solution methods are either necessary or at least highly desirable. In this review, we argue that the alternating direction method of multipliers is well suited to distributed convex optimization, and in particular to large-scale problems arising in statistics, machine learning, and related areas. The method was developed in the 1970s, with roots in the 1950s, and is equivalent or closely related to many other algorithms, such as dual decomposition, the method of multipliers, Douglas-Rachford splitting, Spingarn's method of partial inverses, Dykstra's alternating projections, Bregman iterative algorithms for ℓ1 problems, proximal methods, and thers. After briefly surveying the theory and history of the algorithm, we discuss applications to a wide variety of statistical and machine learning problems of recent interest, including the lasso, sparse logistic regression, basis pursuit, covariance selection, support vector machines, and many others. We also discuss general distributed optimization, extensions to the nonconvex setting, and efficient implementation, including some details on distributed MPI and Hadoop MapReduce implementations. © 2011 S. Boyd, N. Parikh, E. Chu, B. Peleato and J. Eckstein.},
+  file = {/home/brian/Zotero/storage/5BATZESV/admm_distr_stats.pdf}
 }
 
 @article{brockett_Lie_1973,
@@ -517,6 +551,33 @@
   file = {/home/brian/Zotero/storage/MELSDLCL/Brockett - 1973 - Lie Theory and Control Systems Defined on Spheres.pdf;/home/brian/Zotero/storage/R45CRKGP/Brockett - 1973 - Lie Theory and Control Systems Defined on Spheres.pdf;/home/brian/Zotero/storage/MUNT56DL/0125025.html}
 }
 
+@article{bruder_Advantages_2021,
+  title = {Advantages of {{Bilinear Koopman Realizations}} for the {{Modeling}} and {{Control}} of {{Systems}} with {{Unknown Dynamics}}},
+  author = {Bruder, Daniel and Fu, Xun and Vasudevan, Ram},
+  date = {2021},
+  journaltitle = {IEEE Robotics and Automation Letters},
+  volume = {6},
+  number = {3},
+  pages = {4369--4376},
+  doi = {10.1109/LRA.2021.3068117},
+  abstract = {Nonlinear dynamical systems can be made easier to control by lifting them into the space of observable functions, where their evolution is described by the linear Koopman operator. This letter describes how the Koopman operator can be used to generate approximate linear, bilinear, and nonlinear model realizations from data, and argues in favor of bilinear realizations for characterizing systems with unknown dynamics. Necessary and sufficient conditions for a dynamical system to have a valid linear or bilinear realization over a given set of observable functions are presented and used to show that every control-affine system admits an infinite-dimensional bilinear realization, but does not necessarily admit a linear one. Therefore, approximate bilinear realizations constructed from generic sets of basis functions tend to improve as the number of basis functions increases, whereas approximate linear realizations may not. To demonstrate the advantages of bilinear Koopman realizations for control, a linear, bilinear, and nonlinear Koopman model realization of a simulated robot arm is constructed from data. In a trajectory following task, the bilinear realization exceeds the prediction accuracy of the linear realization and the computational efficiency of the nonlinear realization when incorporated into a model predictive control framework.},
+  keywords = {Model learning for control},
+  file = {/home/brian/Zotero/storage/FL7CV29Q/2010.09961.pdf}
+}
+
+@inproceedings{brudigam_LinearQuadratic_2021,
+  title = {Linear-{{Quadratic Optimal Control}} in {{Maximal Coordinates}}},
+  booktitle = {Proceedings - {{IEEE International Conference}} on {{Robotics}} and {{Automation}}},
+  author = {Brüdigam, Jan and Manchester, Zachary},
+  date = {2021},
+  volume = {2021-May},
+  pages = {3546--3552},
+  publisher = {{Institute of Electrical and Electronics Engineers Inc.}},
+  doi = {10.1109/ICRA48506.2021.9561871},
+  abstract = {The linear-quadratic regulator (LQR) is an efficient control method for linear and linearized systems. Typically, LQR is implemented in minimal coordinates (also called generalized or “joint” coordinates). However, other coordinates are possible and recent research suggests that there may be numerical and control-theoretic advantages when using higher-dimensional non-minimal state parameterizations for dynamical systems. One such parameterization is maximal coordinates, in which each link in a multi-body system is parameterized by its full six degrees of freedom and joints between links are modeled with algebraic constraints. Such constraints can also represent closed kinematic loops or contact with the environment. This paper investigates the difference between minimal- and maximal-coordinate LQR control laws. A case study of applying LQR to a simple pendulum and simulations comparing the basins of attraction of minimal- and maximal-coordinate LQR controllers suggest that maximal-coordinate LQR achieves greater robustness and improved performance compared to minimal-coordinate LQR when applied to nonlinear systems.},
+  file = {/home/brian/Zotero/storage/ENPXTTVM/Brudigam and Manchester - Linear-Quadratic Optimal Control in Maximal Coordi.pdf}
+}
+
 @inproceedings{brudigam_LinearTime_2020,
   title = {Linear-{{Time Variational Integrators}} in {{Maximal Coordinates}}},
   booktitle = {Workshop on the {{Algorithmic Foundations}} of {{Robotics}}},
@@ -527,7 +588,7 @@
   url = {https://rexlab.stanford.edu/papers/max_coord_dynamics.pdf},
   abstract = {Most dynamic simulation tools parameterize the configuration of multi-body robotic systems using minimal coordinates, also called generalized or joint coordinates. However, maximal-coordinate approaches have several advantages over minimal-coordinate parameterizations, including native handling of closed kinematic loops and nonholonomic constraints. This paper describes a linear-time variational integrator that is formulated in maximal coordinates. Due to its variational formulation, the algorithm does not suffer from constraint drift and has favorable energy and momentum conservation properties. A sparse matrix factorization technique allows the dynamics of a loop-free articulated mechanism with n links to be computed in O(n) (linear) time. Additional constraints that introduce loops can also be handled by the algorithm without incurring much computational overhead. Experimental results show that our approach offers speed competitive with existing minimalcoordinate algorithms while outperforming them in several scenarios, especially when dealing with closed loops and configuration singularities.},
   eventtitle = {{{WAFR}} 2020},
-  keywords = {Computer Science - Robotics,Physics - Computational Physics},
+  keywords = {Computer animation and Simulation,Computer Science - Robotics,Discrete mechanics,Dynamics,Maximal coordinates,Physics - Computational Physics,Variational integrators},
   annotation = {pubs-conference},
   file = {/home/brian/Zotero/storage/LG7YHCFA/Brudigam and Manchester - Linear-Time Variational Integrators in Maximal Coo.pdf;/home/brian/Zotero/storage/S4EUXQMY/Brüdigam and Manchester - 2021 - Linear-Time Variational Integrators in Maximal Coo.pdf}
 }
@@ -724,6 +785,13 @@
   archiveprefix = {arXiv},
   keywords = {Computer Science - Artificial Intelligence,Computer Science - Computer Vision and Pattern Recognition,Computer Science - Distributed; Parallel; and Cluster Computing,Computer Science - Robotics},
   file = {/home/brian/Zotero/storage/SQB7QJGZ/Davison and Ortiz - 2019 - FutureMapping 2 Gaussian Belief Propagation for S.pdf;/home/brian/Zotero/storage/QH4APFFZ/1910.html}
+}
+
+@article{debnath_Invariant_,
+  title = {Invariant {{Extended Kalman Filtering}} for {{Robot Localization}} Using {{IMU}} and {{GPS}}},
+  author = {Debnath, Saptadeep and Liang, Anthony and Manda, Gaurav and Tang, Sunbochen and Zhou, Hao},
+  url = {https://youtu.be/aILSsw7K2z8},
+  abstract = {This paper derives an IMU-GPS-fused inertial navigation observer for a mobile robot using the theory of invariant observer design. One of the main features of invariant observers for invariant systems on Lie groups is that the estimation error is autonomous, hence the observable state variables can be rendered convergent within a domain of attraction that is independent of the system's trajectory. The Invariant Extended Kalman Filter (In-EKF) which is an extension of the Extended Kalman Filter (EKF) is supposed to be more efficient given that the system converges to constant values on a larger set of trajectories as opposed to the equilibrium points that an EKF is based on. This paper explores the implementation of the In-EKF for robot localization and is compared against an implementation of the EKF. The localization is performed on the University of Michigan north campus long-term vision and LIDAR dataset.}
 }
 
 @inproceedings{decrousaz_Aggressive_2014,
@@ -930,6 +998,21 @@
   file = {/home/brian/Zotero/storage/BTDZ23YY/Farshidian et al. - 2017 - Real-time motion planning of legged robots A mode.pdf;/home/brian/Zotero/storage/QHCY4QM4/Farshidian et al. - 2017 - Real-time motion planning of legged robots A mode.pdf;/home/brian/Zotero/storage/WSQ7N9H7/Farshidian et al. - 2017 - Real-time motion planning of legged robots A mode.pdf;/home/brian/Zotero/storage/LNI3Z3CV/8246930.html;/home/brian/Zotero/storage/PXUITS8W/8246930.html}
 }
 
+@legislation{fasel_SINDy_2021,
+  title = {{{SINDy}} with {{Control}}: {{A Tutorial}}},
+  editor = {Fasel, Urban and Kaiser, Eurika and Kutz, J. Nathan and Brunton, Bingni W. and Brunton, Steven L.},
+  date = {2021},
+  volume = {2021-Decem},
+  pages = {21},
+  publisher = {{Institute of Electrical and Electronics Engineers Inc.}},
+  doi = {10.1109/CDC45484.2021.9683120},
+  url = {https://github.com/urban-fasel/SEIR},
+  abstract = {Many dynamical systems of interest are nonlinear, with examples in turbulence, epidemiology, neuroscience, and finance, making them difficult to control using linear approaches. Model predictive control (MPC) is a powerful model-based optimization technique that enables the control of such nonlinear systems with constraints. However, modern systems often lack computationally tractable models, motivating the use of system identification techniques to learn accurate and efficient models for real-time control. In this tutorial article, we review emerging data-driven methods for model discovery and how they are used for nonlinear MPC. In particular, we focus on the sparse identification of nonlinear dynamics (SINDy) algorithm and show how it may be used with MPC on an infectious disease control example. We compare the performance against MPC based on a linear dynamic mode decomposition (DMD) model. Code is provided to run the tutorial examples and may be modified to extend this data-driven control framework to arbitrary nonlinear systems.},
+  editoratype = {collaborator},
+  isbn = {9781665436595},
+  keywords = {data-driven models,DMD,ma-chine learning,machine learning,Model predictive control,SINDy,system identification}
+}
+
 @inproceedings{feng_Robust_2016,
   title = {Robust Dynamic Walking Using Online Foot Step Optimization},
   booktitle = {2016 {{IEEE}}/{{RSJ International Conference}} on {{Intelligent Robots}} and {{Systems}} ({{IROS}})},
@@ -969,6 +1052,87 @@
   author = {Foehn, Philipp and Falanga, Davide and Kuppuswamy, Naveen and Tedrake, Russ and Scaramuzza, Davide},
   date = {2017},
   pages = {1--10}
+}
+
+@article{folkestad_Episodic_2020,
+  title = {Episodic {{Koopman Learning}} of {{Nonlinear Robot Dynamics}} with {{Application}} to {{Fast Multirotor Landing}}},
+  author = {Folkestad, Carl and Pastor, Daniel and Burdick, Joel W.},
+  date = {2020-05},
+  journaltitle = {Proceedings - IEEE International Conference on Robotics and Automation},
+  pages = {9216--9222},
+  publisher = {{Institute of Electrical and Electronics Engineers Inc.}},
+  issn = {9781728173955},
+  doi = {10.1109/ICRA40945.2020.9197510},
+  abstract = {This paper presents a novel episodic method to learn a robot's nonlinear dynamics model and an increasingly optimal control sequence for a set of tasks. The method is based on the Koopman operator approach to nonlinear dynamical systems analysis, which models the flow of observables in a function space, rather than a flow in a state space. Practically, this method estimates a nonlinear diffeomorphism that lifts the dynamics to a higher dimensional space where they are linear. Efficient Model Predictive Control methods can then be applied to the lifted model. This approach allows for real time implementation in on-board hardware, with rigorous incorporation of both input and state constraints during learning. We demonstrate the method in a real-time implementation of fast multirotor landing, where the nonlinear ground effect is learned and used to improve landing speed and quality.}
+}
+
+@inproceedings{folkestad_Extended_2020,
+  title = {Extended {{Dynamic Mode Decomposition}} with {{Learned Koopman Eigenfunctions}} for {{Prediction}} and {{Control}}},
+  booktitle = {2020 American Control Conference ({{ACC}})},
+  author = {Folkestad, Carl and Pastor, Daniel and Mezic, Igor and Mohr, Ryan and Fonoberova, Maria and Burdick, Joel},
+  date = {2020},
+  pages = {3906--3913},
+  organization = {{IEEE}}
+}
+
+@inproceedings{folkestad_Koopman_2021,
+  title = {Koopman {{NMPC}}: {{Koopman-based Learning}} and {{Nonlinear Model Predictive Control}} of {{Control-affine Systems}}},
+  booktitle = {Proceedings - {{IEEE International Conference}} on {{Robotics}} and {{Automation}}},
+  author = {Folkestad, Carl and Burdick, Joel W.},
+  date = {2021},
+  volume = {2021-May},
+  pages = {7350--7356},
+  publisher = {{Institute of Electrical and Electronics Engineers Inc.}},
+  doi = {10.1109/ICRA48506.2021.9562002},
+  abstract = {Koopman-based learning methods can potentially be practical and powerful tools for dynamical robotic systems. However, common methods to construct Koopman representations seek to learn lifted linear models that cannot capture nonlinear actuation effects inherent in many robotic systems. This paper presents a learning and control methodology that is a first step towards overcoming this limitation. Using the Koopman canonical transform, control-affine dynamics can be expressed by a lifted bilinear model. The learned model is used for nonlinear model predictive control (NMPC) design where the bilinear structure can be exploited to improve computational efficiency. The benefits for control-affine dynamics compared to existing Koopman-based methods are highlighted through an example of a simulated planar quadrotor. Prediction error is greatly reduced and closed loop performance similar to NMPC with full model knowledge is achieved.},
+  isbn = {978-1-72819-077-8}
+}
+
+@inproceedings{folkestad_KoopNet_2022,
+  title = {{{KoopNet}}: {{Joint}} Learning of Koopman Bilinear Models and Function Dictionaries with Application to Quadrotor Trajectory Tracking},
+  booktitle = {2022 International Conference on Robotics and Automation ({{ICRA}})},
+  author = {Folkestad, Carl and Wei, Skylar X and Burdick, Joel W},
+  date = {2022},
+  pages = {1344--1350},
+  organization = {{IEEE}}
+}
+
+@unpublished{folkestad_Quadrotor_2021,
+  title = {Quadrotor {{Trajectory Tracking}} with {{Learned Dynamics}}: {{Joint Koopman-based Learning}} of {{System Models}} and {{Function Dictionaries}}},
+  shorttitle = {Quadrotor {{Trajectory Tracking}} with {{Learned Dynamics}}},
+  author = {Folkestad, Carl and Wei, Skylar X. and Burdick, Joel W.},
+  date = {2021-10-19},
+  number = {arXiv:2110.10341},
+  eprint = {2110.10341},
+  eprinttype = {arxiv},
+  primaryclass = {cs},
+  publisher = {{arXiv}},
+  url = {http://arxiv.org/abs/2110.10341},
+  urldate = {2022-06-13},
+  abstract = {Nonlinear dynamical effects are crucial to the operation of many agile robotic systems. Koopman-based model learning methods can capture these nonlinear dynamical system effects in higher dimensional lifted bilinear models that are amenable to optimal control. However, standard methods that lift the system state using a fixed function dictionary before model learning result in high dimensional models that are intractable for real time control. This paper presents a novel method that jointly learns a function dictionary and lifted bilinear model purely from data by incorporating the Koopman model in a neural network architecture. Nonlinear MPC design utilizing the learned model can be performed readily. We experimentally realized this method on a multirotor drone for agile trajectory tracking at low altitudes where the aerodynamic ground effect influences the system's behavior. Experimental results demonstrate that the learning-based controller achieves similar performance as a nonlinear MPC based on a nominal dynamics model in medium altitude. However, our learning-based system can reliably track trajectories in near-ground flight regimes while the nominal controller crashes due to unmodeled dynamical effects that are captured by our method.},
+  archiveprefix = {arXiv},
+  keywords = {Computer Science - Robotics},
+  file = {/home/brian/Zotero/storage/VQXRWTLP/Folkestad et al. - 2021 - Quadrotor Trajectory Tracking with Learned Dynamic.pdf;/home/brian/Zotero/storage/4ZBRG25I/2110.html}
+}
+
+@article{fong_LSMR_2011,
+  title = {{{LSMR}}: {{An Iterative Algorithm}} for {{Sparse Least-Squares Problems}}},
+  shorttitle = {{{LSMR}}},
+  author = {Fong, David Chin-Lung and Saunders, Michael},
+  date = {2011-01},
+  journaltitle = {SIAM Journal on Scientific Computing},
+  shortjournal = {SIAM J. Sci. Comput.},
+  volume = {33},
+  number = {5},
+  pages = {2950--2971},
+  publisher = {{Society for Industrial and Applied Mathematics}},
+  issn = {1064-8275},
+  doi = {10.1137/10079687X},
+  url = {https://epubs.siam.org/doi/abs/10.1137/10079687X},
+  urldate = {2022-06-14},
+  abstract = {An iterative method LSMR is presented for solving linear systems \$Ax=b\$ and least-squares problems \$\textbackslash min \textbackslash |Ax-b\textbackslash |\_2\$, with A being sparse or a fast linear operator. LSMR is based on the Golub–Kahan bidiagonalization process. It is analytically equivalent to the MINRES method applied to the normal equation \$AT̂\textbackslash! Ax = AT̂\textbackslash! b\$, so that the quantities \$\textbackslash |AT̂\textbackslash! r\_k\textbackslash |\$ are monotonically decreasing (where \$r\_k = b - Ax\_k\$ is the residual for the current iterate \$x\_k\$). We observe in practice that \$\textbackslash |r\_k\textbackslash |\$ also decreases monotonically, so that compared to LSQR (for which only \$\textbackslash |r\_k\textbackslash |\$ is monotonic) it is safer to terminate LSMR early. We also report some experiments with reorthogonalization.},
+  keywords = {15A06,65F10,65F20,65F22,65F25,65F35,65F50,93E24,conjugate-gradient method,Golub–Kahan process,iterative method,Krylov subspace method,least-squares problem,LSQR,minimum-residual method,MINRES,sparse matrix},
+  file = {/home/brian/Zotero/storage/4M9DQ27Q/Fong and Saunders - 2011 - LSMR An Iterative Algorithm for Sparse Least-Squa.pdf}
 }
 
 @thesis{fowler_Application_2003,
@@ -1137,6 +1301,21 @@
   file = {/home/brian/Zotero/storage/CEWD3AHL/Garstka et al. - 2019 - COSMO A conic operator splitting method for large.pdf}
 }
 
+@article{garstka_COSMO_2021,
+  title = {{{COSMO}}: {{A Conic Operator Splitting Method}} for {{Convex Conic Problems}}},
+  author = {Garstka, Michael and Cannon, Mark and Goulart, Paul},
+  date = {2021-09},
+  journaltitle = {Journal of Optimization Theory and Applications},
+  volume = {190},
+  number = {3},
+  pages = {779--810},
+  publisher = {{Springer}},
+  doi = {10.1007/S10957-021-01896-X/TABLES/7},
+  url = {https://link.springer.com/article/10.1007/s10957-021-01896-x},
+  abstract = {This paper describes the conic operator splitting method (COSMO) solver, an operator splitting algorithm and associated software package for convex optimisation problems with quadratic objective function and conic constraints. At each step, the algorithm alternates between solving a quasi-definite linear system with a constant coefficient matrix and a projection onto convex sets. The low per-iteration computational cost makes the method particularly efficient for large problems, e.g. semidefinite programs that arise in portfolio optimisation, graph theory, and robust control. Moreover, the solver uses chordal decomposition techniques and a new clique merging algorithm to effectively exploit sparsity in large, structured semidefinite programs. Numerical comparisons with other state-of-the-art solvers for a variety of benchmark problems show the effectiveness of our approach. Our Julia implementation is open source, designed to be extended and customised by the user, and is integrated into the Julia optimisation ecosystem.},
+  keywords = {ADMM,Chordal decomposition,Clique merging,Conic programming}
+}
+
 @inproceedings{gatherer_Magnetorqueronly_2019,
   title = {Magnetorquer-Only Attitude Control of Small Satellites Using Trajectory Optimization},
   booktitle = {2019 {{AAS}}/{{AIAA Astrodynamics Specialist Conference}}},
@@ -1176,6 +1355,20 @@
   urldate = {2021-04-24},
   abstract = {Let M be a mesh consisting of \$n\^2 \$ squares called elements, formed by subdividing the unit square \$(0,1) \textbackslash times (0,1)\$ into \$n\^2 \$ small squares of side \$\{1 / h\}\$, and having a node at each of the \$(n + 1)\^2 \$ grid points. With M we associate the \$N \textbackslash times N\$ symmetric positive definite system \$Ax = b\$, where \$N = (n + 1)\^2 \$, each \$x\_i \$ is associated with a node of M, and \$A\_\{ij\}  \textbackslash ne 0\$ if and only if \$x\_i \$ and \$x\_j \$ are associated with nodes of the same element. If we solve the equations via the standard symmetric factorization of A, then \$O(n\^4 )\$ arithmetic operations are required if the usual row by row (banded) numbering scheme is used, and the storage required is \$O(n\^3 )\$. In this paper we present an unusual numbering of the mesh (unknowns) and show that if we avoid operating on zeros, the \$LDL\^T \$ factorization of A can be computed using the same standard algorithm in \$O(n\^3 )\$ arithmetic operations. Furthermore, the storage required is only \$O(n\^2 \textbackslash log \_2 n)\$. Finally, we prove that all orderings of the mesh must yield an operation count of at least \$O(n\^3 )\$, provided we use the standard factorization algorithm.},
   file = {/home/brian/Zotero/storage/WPZ26PKT/George - 1973 - Nested Dissection of a Regular Finite Element Mesh.pdf;/home/brian/Zotero/storage/5FE97LH2/0710032.html;/home/brian/Zotero/storage/NW9VUGLR/0710032.html}
+}
+
+@inproceedings{ghirnikar_Stable_1990,
+  title = {Stable Recursive Least Squares Filtering Using an Inverse {{QR}} Decomposition},
+  booktitle = {International {{Conference}} on {{Acoustics}}, {{Speech}}, and {{Signal Processing}}},
+  author = {Ghirnikar, A. and Alexander, S.T.},
+  date = {1990-04},
+  pages = {1623-1626 vol.3},
+  issn = {1520-6149},
+  doi = {10.1109/ICASSP.1990.115736},
+  abstract = {The performance of recursive-least-squares (RLS) algorithm based on an inverse QR decomposition is reported. Theoretical analysis provides performance measures in a finite precision environment. The performance measure is derived in terms of the biases that are present in steady-state along the diagonal entries of the matrix used in the approach. An analytical expression has been derived for this bias as a function of wordlength, forgetting factor, and signal statistics. This result is further used to show that the diagonal entries will not reduce to zero or become negative, thereby ensuring stability of the algorithm. All analytical results are verified by corresponding simulation results.{$<>$}},
+  eventtitle = {International {{Conference}} on {{Acoustics}}, {{Speech}}, and {{Signal Processing}}},
+  keywords = {Analytical models,Filtering algorithms,Least squares methods,Matrix decomposition,Performance analysis,Resonance light scattering,Signal analysis,Stability,Statistical analysis,Steady-state},
+  file = {/home/brian/Zotero/storage/IYJNNHZS/115736.html}
 }
 
 @unpublished{giftthaler_Automatic_2018,
@@ -1319,6 +1512,26 @@
   publisher = {{Elsevier}}
 }
 
+@article{hoeller_Deep_2020,
+  title = {Deep {{Value Model Predictive Control}}},
+  author = {Hoeller, David ; and Farshidian, Farbod ; and Hutter, Marco and Farshidian, Farbod and Hoeller, David},
+  date = {2020},
+  journaltitle = {Proceedings of the Conference on Robot Learning},
+  volume = {100},
+  pages = {990--1004},
+  publisher = {{PMLR}},
+  doi = {10.3929/ETHZ-B-000368961},
+  url = {https://doi.org/10.3929/ethz-b-000368961},
+  abstract = {Permanent link: https://doi. Abstract: In this paper, we introduce an actor-critic algorithm called Deep Value Model Predictive Control (DMPC), which combines model-based trajectory optimization with value function estimation. The DMPC actor is a Model Predictive Control (MPC) optimizer with an objective function defined in terms of a value function estimated by the critic. We show that our MPC actor is an importance sampler, which minimizes an upper bound of the cross-entropy to the state distribution of the optimal sampling policy. In our experiments with a Ballbot system, we show that our algorithm can work with sparse and binary reward signals to efficiently solve obstacle avoidance and target reaching tasks. Compared to previous work, we show that including the value function in the running cost of the trajectory optimizer speeds up the convergence. We also discuss the necessary strategies to robustify the algorithm in practice.},
+  keywords = {Model Predictive Control (MPC),REINFORCEMENT LEARNING (ARTIFICIAL INTELLIGENCE),ROBOTICS,Value Function Learning}
+}
+
+@article{hofmann_Support_2006,
+  title = {Support {{Vector Machines-Kernels}} and the {{Kernel Trick An}} Elaboration for the {{Hauptseminar}} "{{Reading Club}}: {{Support Vector Machines}}"},
+  author = {Hofmann, Martin},
+  date = {2006}
+}
+
 @report{hogg_Indefinite_2010,
   title = {An Indefinite Sparse Direct Solver for Multicore Machines},
   author = {Hogg, J and Scott, J},
@@ -1379,6 +1592,22 @@
   eventtitle = {{{IEEE Robotics}} and {{Automation Letters}}},
   keywords = {Approximation algorithms,Heuristic algorithms,Motion and Path Planning,Optimization,Optimization and Optimal Control,Planning,Robust/Adaptive Control,Stochastic processes,Trajectory,Transforms},
   file = {/home/brian/Zotero/storage/YINSPTYL/Howell et al. - 2021 - Direct Policy Optimization using Deterministic Sam.pdf;/home/brian/Zotero/storage/BJDEAH9J/9387078.html}
+}
+
+@article{howell_Dojo_2022,
+  title = {Dojo: {{A Differentiable Simulator}} for {{Robotics}}},
+  author = {Howell, Taylor A and Le Cleac', Simon and Kolter, J Zico and Schwager, Mac and Manchester, Zachary},
+  date = {2022},
+  abstract = {We present a differentiable rigid-body-dynamics simulator for robotics that prioritizes physical accuracy and differentiability: Dojo. The simulator utilizes an expressive maximal-coordinates representation, achieves stable simulation at low sample rates, and conserves energy and momentum by employing a variational integrator. A nonlinear complementarity problem, with nonlinear friction cones, models hard contact and is reliably solved using a custom primal-dual interior-point method. The implicit-function theorem enables efficient differentiation of an intermediate relaxed problem and computes smooth gradients from the contact model. We demonstrate the usefulness of the simulator and its gradients through a number of examples including: simulation, trajectory optimization, reinforcement learning, and system identification.}
+}
+
+@inproceedings{huang_Feedback_2018,
+  title = {Feedback Stabilization Using Koopman Operator},
+  booktitle = {2018 {{IEEE Conference}} on {{Decision}} and {{Control}} ({{CDC}})},
+  author = {Huang, Bowen and Ma, Xu and Vaidya, Umesh},
+  date = {2018},
+  pages = {6434--6439},
+  publisher = {{IEEE}}
 }
 
 @article{huang_Survey_2012,
@@ -1648,6 +1877,31 @@
   file = {/home/brian/Zotero/storage/UHT9PREL/Kaess et al. - 2012 - iSAM2 Incremental smoothing and mapping using the.pdf}
 }
 
+@article{kaiser_Datadriven_2021,
+  title = {Data-Driven Discovery of {{Koopman}} Eigenfunctions for Control},
+  author = {Kaiser, Eurika and Kutz, J Nathan and Brunton, Steven L},
+  date = {2021},
+  journaltitle = {Machine Learning: Science and Technology},
+  volume = {2},
+  number = {3},
+  pages = {035023},
+  publisher = {{IOP Publishing}}
+}
+
+@article{kaiser_Sparse_2018,
+  title = {Sparse Identification of Nonlinear Dynamics for Model Predictive Control in the Low-Data Limit},
+  author = {Kaiser, E. and Kutz, J. N. and Brunton, S. L.},
+  date = {2018-11},
+  journaltitle = {Proceedings of the Royal Society A},
+  volume = {474},
+  number = {2219},
+  publisher = {{The Royal Society Publishing}},
+  doi = {10.1098/RSPA.2018.0335},
+  url = {https://royalsocietypublishing.org/doi/full/10.1098/rspa.2018.0335},
+  abstract = {Data-driven discovery of dynamics via machine learning is pushing the frontiers of modelling and control efforts, providing a tremendous opportunity to extend the reach of model predictive control ...},
+  keywords = {control theory,machine learning,model predictive control,nonlinear dynamics,sparse identification of nonlinear dynamics,sparse identification of nonlineardynamics,system identification}
+}
+
 @book{kane_Spacecraft_1983,
   title = {Spacecraft Dynamics},
   author = {Kane, T. R. and Likins, P. W. and Levinson, D. A.},
@@ -1668,6 +1922,19 @@
   entrysubtype = {newspaper},
   langid = {english},
   file = {/home/brian/Zotero/storage/7HYAG7TP/Kang and Bedrossian - Pseudospectral Optimal Control Theory Makes Debut .pdf}
+}
+
+@article{karnchanachari_Practical_2020,
+  title = {Practical {{Reinforcement Learning For MPC}}: {{Learning}} from Sparse Objectives in under an Hour on a Real Robot},
+  author = {Karnchanachari, Napat and Valls, Miguel I and David Hoeller, Sevensensech and Hutter, Marco},
+  date = {2020},
+  journaltitle = {Proceedings of Machine Learning Research},
+  pages = {1--14},
+  publisher = {{OpenReview}},
+  doi = {10.3929/ETHZ-B-000404690},
+  url = {https://doi.org/10.3929/ethz-b-000404690},
+  abstract = {Model Predictive Control (MPC) is a powerful control technique that handles constraints, takes the system's dynamics into account, and optimizes for a given cost function. In practice, however, it often requires an expert to craft and tune this cost function and find trade-offs between different state penalties to satisfy simple high level objectives. In this paper, we use Reinforcement Learning and in particular value learning to approximate the value function given only high level objectives , which can be sparse and binary. Building upon previous works, we present improvements that allowed us to successfully deploy the method on a real world unmanned ground vehicle. Our experiments show that our method can learn the cost function from scratch and without human intervention , while reaching a performance level similar to that of an expert-tuned MPC. We perform a quantitative comparison of these methods with standard MPC approaches both in simulation and on the real robot. A demonstration of our method can be seen in the video: https://youtu.be/PJB8XdXBP\_M},
+  keywords = {Autonomous Robots,Model Predictive Control,Reinforcement Learning}
 }
 
 @inproceedings{kazdadi_Equality_2021,
@@ -1766,6 +2033,19 @@
   eventtitle = {2015 {{IEEE}}/{{RSJ International Conference}} on {{Intelligent Robots}} and {{Systems}} ({{IROS}})},
   keywords = {delay,delays,Delays,HRP-2 humanoid robot,humanoid robots,Humanoid robots,Instruction sets,model-predictive control,motion control,optimal control,optimal trajectory,predictive control,Predictive control,Real-time systems,Trajectory,trajectory control,whole-body motion generation},
   file = {/home/brian/Zotero/storage/AD2UXMS4/Koenemann et al. - 2015 - Whole-body model-predictive control applied to the.pdf;/home/brian/Zotero/storage/MIVJQGEH/Koenemann et al. - 2015 - Whole-body model-predictive control applied to the.pdf;/home/brian/Zotero/storage/M6YM63DS/7353843.html}
+}
+
+@article{korda_Linear_2018,
+  title = {Linear Predictors for Nonlinear Dynamical Systems: {{Koopman}} Operator Meets Model Predictive Control},
+  author = {Korda, Milan and Mezić, Igor},
+  date = {2018},
+  journaltitle = {Automatica},
+  volume = {93},
+  pages = {149--160},
+  doi = {10.1016/j.automatica.2018.03.046},
+  url = {https://doi.org/10.1016/j.automatica.2018.03.046},
+  abstract = {This paper presents a class of linear predictors for nonlinear controlled dynamical systems. The basic idea is to lift (or embed) the nonlinear dynamics into a higher dimensional space where its evolution is approximately linear. In an uncontrolled setting, this procedure amounts to numerical approximations of the Koopman operator associated to the nonlinear dynamics. In this work, we extend the Koopman operator to controlled dynamical systems and apply the Extended Dynamic Mode Decomposition (EDMD) to compute a finite-dimensional approximation of the operator in such a way that this approximation has the form of a linear controlled dynamical system. In numerical examples, the linear predictors obtained in this way exhibit a performance superior to existing linear predictors such as those based on local linearization or the so called Carleman linearization. Importantly, the procedure to construct these linear predictors is completely data-driven and extremely simple-it boils down to a nonlinear transformation of the data (the lifting) and a linear least squares problem in the lifted space that can be readily solved for large data sets. These linear predictors can be readily used to design controllers for the nonlinear dynamical system using linear controller design methodologies. We focus in particular on model predictive control (MPC) and show that MPC controllers designed in this way enjoy computational complexity of the underlying optimization problem comparable to that of MPC for a linear dynamical system with the same number of control inputs and the same dimension of the state-space. Importantly, linear inequality constraints on the state and control inputs as well as nonlinear constraints on the state can be imposed in a linear fashion in the proposed MPC scheme. Similarly, cost functions nonlinear in the state variable can be handled in a linear fashion. We treat both the full-state measurement case and the input-output case, as well as systems with disturbances/noise. Numerical examples demonstrate the approach. 1},
+  keywords = {Data-driven control design,Koopman operator,Lifting,Model predictive control,Optimal control}
 }
 
 @article{kouzoupis_Block_2015,
@@ -1883,6 +2163,13 @@
   date = {2014},
   pages = {2077--2082},
   publisher = {{IEEE}}
+}
+
+@book{kutz_Dynamic_2016,
+  title = {Dynamic Mode Decomposition: Data-Driven Modeling of Complex Systems},
+  author = {Kutz, J Nathan and Brunton, Steven L and Brunton, Bingni W and Proctor, Joshua L},
+  date = {2016},
+  publisher = {{SIAM}}
 }
 
 @article{kuwata_Cooperative_2010,
@@ -2039,6 +2326,17 @@
   file = {/home/brian/Zotero/storage/AMNVAP8Q/Leineweber et al. - 2003 - An efficient multiple shooting based reduced SQP s.pdf}
 }
 
+@article{li_Extended_2017,
+  title = {Extended Dynamic Mode Decomposition with Dictionary Learning: {{A}} Data-Driven Adaptive Spectral Decomposition of the {{Koopman}} Operator},
+  author = {Li, Qianxiao and Dietrich, Felix and Bollt, Erik M and Kevrekidis, Ioannis G},
+  date = {2017},
+  journaltitle = {Chaos: An Interdisciplinary Journal of Nonlinear Science},
+  volume = {27},
+  number = {10},
+  pages = {103111},
+  publisher = {{AIP Publishing LLC}}
+}
+
 @inproceedings{li_Iterative_2004,
   title = {Iterative {{Linear Quadratic Regulator Design}} for {{Nonlinear Biological Movement Systems}}},
   author = {Li, Weiwei and Todorov, Emanuel},
@@ -2067,6 +2365,19 @@
   abstract = {In this paper, we present a two-phase augmented Lagrangian method, called QSDPNAL, for solving convex quadratic semidefinite programming (QSDP) problems with constraints consisting of a large number of linear equality and inequality constraints, a simple convex polyhedral set constraint, and a positive semidefinite cone constraint. A first order algorithm which relies on the inexact Schur complement based decomposition technique is developed in QSDPNAL-Phase I with the aim of solving a QSDP problem to moderate accuracy or using it to generate a reasonably good initial point for the second phase. In QSDPNAL-Phase II, we design an augmented Lagrangian method (ALM) wherein the inner subproblem in each iteration is solved via inexact semismooth Newton based algorithms. Simple and implementable stopping criteria are designed for the ALM. Moreover, under mild conditions, we are able to establish the rate of convergence of the proposed algorithm and prove the R-(super)linear convergence of the KKT residual. In the implementation of QSDPNAL, we also develop efficient techniques for solving large scale linear systems of equations under certain subspace constraints. More specifically, simpler and yet better conditioned linear systems are carefully designed to replace the original linear systems and novel shadow sequences are constructed to alleviate the numerical difficulties brought about by the crucial subspace constraints. Extensive numerical results for various large scale QSDPs show that our two-phase algorithm is highly efficient and robust in obtaining accurate solutions. The software reviewed as part of this submission was given the DOI (Digital Object Identifier) https://doi.org/10.5281/zenodo.1206980.},
   langid = {english},
   file = {/home/brian/Zotero/storage/PG58AT53/Li et al. - 2018 - QSDPNAL a two-phase augmented Lagrangian method f.pdf}
+}
+
+@article{li_Reinforcement_2021,
+  title = {Reinforcement {{Learning}} for {{Robust Parameterized Locomotion Control}} of {{Bipedal Robots}}},
+  author = {Li, Zhongyu and Cheng, Xuxin and Peng, Xue Bin and Abbeel, Pieter and Levine, Sergey and Berseth, Glen and Sreenath, Koushil},
+  date = {2021},
+  journaltitle = {Proceedings - IEEE International Conference on Robotics and Automation},
+  volume = {2021-May},
+  pages = {2811--2817},
+  publisher = {{Institute of Electrical and Electronics Engineers Inc.}},
+  issn = {9781728190778},
+  doi = {10.1109/ICRA48506.2021.9560769},
+  abstract = {Developing robust walking controllers for bipedal robots is a challenging endeavor. Traditional model-based locomotion controllers require simplifying assumptions and careful modelling; any small errors can result in unstable control. To address these challenges for bipedal locomotion, we present a model-free reinforcement learning framework for training robust locomotion policies in simulation, which can then be transferred to a real bipedal Cassie robot. To facilitate sim-to-real transfer, domain randomization is used to encourage the policies to learn behaviors that are robust across variations in system dynamics. The learned policies enable Cassie to perform a set of diverse and dynamic behaviors, while also being more robust than traditional controllers and prior learning-based methods that use residual control. We demonstrate this on versatile walking behaviors such as tracking a target walking velocity, walking height, and turning yaw. (Video).}
 }
 
 @unpublished{liang_Inexact_2020,
@@ -2228,6 +2539,15 @@
   file = {/home/brian/Zotero/storage/NDY4ULF4/Longo et al. - 2011 - Parallel move blocking Model Predictive Control.pdf;/home/brian/Zotero/storage/IC954FDY/6160429.html}
 }
 
+@inproceedings{ma_Optimal_2019,
+  title = {Optimal Quadratic Regulation of Nonlinear System Using Koopman Operator},
+  booktitle = {2019 {{American Control Conference}} ({{ACC}})},
+  author = {Ma, Xu and Huang, Bowen and Vaidya, Umesh},
+  date = {2019},
+  pages = {4911--4916},
+  publisher = {{IEEE}}
+}
+
 @thesis{maggioni_Sparse_2016,
   type = {thesis},
   title = {Sparse {{Convex Optimization}} on {{GPUs}}},
@@ -2239,6 +2559,13 @@
   abstract = {Convex optimization is a fundamental mathematical framework used for general problem solving. The computational time taken to optimize problems formulated as Linear Programming, Integer Linear Programming or Quadratic Programming has an immediate impact on countless application fields, and it is critical to determining which problems we will be able to solve in the future. Since the very beginning, the research community has always been investigating on new algorithmic and numerical techniques to speed up convex optimization. Recently, the focus has included parallel computer architectures and their ability to perform high-throughput computation. This dissertation continues on the same research direction developing novel computational techniques tailored for modern GPUs. We focus on problems with sparse structure which are, arguably, the most challenging to solve on throughput-oriented many-core architectures naturally well-suited for dense computations As original contribution, we combine the leading ideas in SpMV optimization on GPUs into an advanced sparse format known as AdELL+. We also speed up the class of optimization algorithms known as Interior Points Methods with GPU-based adaptive strategies to select between Cholesky factorization and Conjugate Gradient. Last, we design an incremental matrix data structure that provides the foundation for implementing “branch-and-cut” ILP solvers.},
   langid = {english},
   file = {/home/brian/Zotero/storage/NI8PP27H/Maggioni - 2016 - Sparse Convex Optimization on GPUs.pdf;/home/brian/Zotero/storage/D49DDPTS/1.html}
+}
+
+@inproceedings{mamakoukas_Local_2019,
+  title = {Local {{Koopman}} Operators for Data-Driven Control of Robotic Systems},
+  booktitle = {Robotics: Science and Systems},
+  author = {Mamakoukas, Giorgos and Castano, Maria and Tan, Xiaobo and Murphey, Todd},
+  date = {2019}
 }
 
 @inproceedings{manchester_Derivativefree_2016,
@@ -2269,6 +2596,16 @@
   isbn = {978-0-9923747-3-0},
   langid = {english},
   file = {/home/brian/Zotero/storage/K8P8EWCN/Manchester and Kuindersma - 2017 - DIRTREL Robust Trajectory Optimization with Ellip.pdf}
+}
+
+@inproceedings{manchester_Variable_2017,
+  title = {A {{Variable Forward-Sweep Wing Design}} for {{Enhanced Perching}} in {{Micro Aerial Vehicles}}},
+  booktitle = {{{AIAA Aerospace Sciences Meeting}}},
+  author = {Manchester, Zachary and Lipton, Jeffrey and Wood, Robert and Kuindersma, Scott},
+  date = {2017-01},
+  location = {{Grapevine, TX}},
+  url = {https://rexlab.stanford.edu/papers/Morphing_Wing.pdf},
+  file = {/home/brian/Zotero/storage/RGXKX76X/Morphing_Wing.pdf}
 }
 
 @inproceedings{manchester_Variational_2017,
@@ -2370,6 +2707,15 @@
   file = {/home/brian/Zotero/storage/WLJPVG2E/00207176608921369.html}
 }
 
+@article{meduri_BiConMP_2022,
+  title = {{{BiConMP}}: {{A Nonlinear Model Predictive Control Framework}} for {{Whole Body Motion Planning}}},
+  author = {Meduri, Avadesh and Shah, Paarth and Viereck, Julian and Khadiv, Majid and Havoutis, Ioannis and Righetti, Ludovic},
+  date = {2022-01},
+  doi = {10.48550/arxiv.2201.07601},
+  url = {https://arxiv.org/abs/2201.07601v1},
+  abstract = {Online planning of whole-body motions for legged robots is challenging due to the inherent nonlinearity in the robot dynamics. In this work, we propose a nonlinear MPC framework, the BiConMP which can generate whole body trajectories online by efficiently exploiting the structure of the robot dynamics. BiConMP is used to generate various cyclic gaits on a real quadruped robot and its performance is evaluated on different terrain, countering unforeseen pushes and transitioning online between different gaits. Further, the ability of BiConMP to generate non-trivial acyclic whole-body dynamic motions on the robot is presented. Finally, an extensive empirical analysis on the effects of planning horizon and frequency on the nonlinear MPC framework is reported and discussed.}
+}
+
 @inproceedings{mellinger_Minimum_2011,
   title = {Minimum Snap Trajectory Generation and Control for Quadrotors},
   booktitle = {2011 {{IEEE International Conference}} on {{Robotics}} and {{Automation}}},
@@ -2448,6 +2794,19 @@
   file = {/home/brian/Zotero/storage/5ZQMBHNT/Mitrovic et al. - 2010 - Adaptive Optimal Feedback Control with Learned Int.pdf}
 }
 
+@article{moore_Robust_2014,
+  title = {Robust Post-Stall Perching with a Simple Fixed-Wing Glider Using {{LQR-Trees}}},
+  author = {Moore, Joseph and Cory, Rick and Tedrake, Russ},
+  date = {2014-05},
+  journaltitle = {Bioinspiration \&amp\$\textbackslash mathsemicolon\$ Biomimetics},
+  volume = {9},
+  number = {2},
+  pages = {025013},
+  doi = {10.1088/1748-3182/9/2/025013},
+  url = {https://doi.org/10.1088/1748-3182/9/2/025013},
+  abstract = {Birds routinely execute post-stall maneuvers with a speed and precision far beyond the capabilities of our best aircraft control systems. One remarkable example is a bird exploiting post-stall pressure drag in order to rapidly decelerate to land on a perch. Stall is typically associated with a loss of control authority, and it is tempting to attribute this agility of birds to the intricate morphology of the wings and tail, to their precision sensing apparatus, or their ability to perform thrust vectoring. Here we ask whether an extremely simple fixed-wing glider (no propeller) with only a single actuator in the tail is capable of landing precisely on a perch from a large range of initial conditions. To answer this question, we focus on the design of the flight control system; building upon previous work which used linear feedback control design based on quadratic regulators (LQR), we develop nonlinear feedback control based on nonlinear model-predictive control and ‘LQR-Trees’. Through simulation using a flat-plate model of the glider, we find that both nonlinear methods are capable of achieving an accurate bird-like perching maneuver from a large range of initial conditions; the ‘LQR-Trees’ algorithm is particularly useful due to its low computational burden at runtime and its inherent performance guarantees. With this in mind, we then implement the ‘LQR-Trees’ algorithm on real hardware and demonstrate a 95 percent perching success rate over 147 flights for a wide range of initial speeds. These results suggest that, at least in the absence of significant disturbances like wind gusts, complex wing morphology and sensing are not strictly required to achieve accurate and robust perching even in the post-stall flow regime.}
+}
+
 @inproceedings{mordatch_Combining_2014,
   title = {Combining the Benefits of Function Approximation and Trajectory Optimization},
   booktitle = {Robotics: {{Science}} and {{Systems X}}},
@@ -2475,6 +2834,17 @@
   eventtitle = {2016 {{IEEE International Conference}} on {{Robotics}} and {{Automation}} ({{ICRA}})},
   keywords = {7-DOF robotic arm planning problems,7-DOF WAM arm,continuous-time trajectories,continuous-time trajectory,differential equations,discrete state parameterization,fundamental tool,Gaussian process motion planner,Gaussian process motion planning,Gaussian processes,GP interpolation,GPMP,interpolation,Interpolation,linear systems,linear time-varying stochastic differential equation,manipulators,optimisation,path planning,Planning,robotics,Robots,time-varying systems,time-varying-based optimization technique,trajectory control,Trajectory optimization,trajectory optimization algorithms},
   file = {/home/brian/Zotero/storage/RK8MRNGQ/Mukadam et al. - 2016 - Gaussian Process Motion planning.pdf;/home/brian/Zotero/storage/V2FH3RCA/Mukadam et al. - 2016 - Gaussian Process Motion planning.pdf;/home/brian/Zotero/storage/STB7XHXI/7487091.html}
+}
+
+@article{narasingam_Datadriven_2022,
+  title = {Data-Driven Feedback Stabilization of Nonlinear Systems: {{Koopman-based}} Model Predictive Control},
+  author = {Narasingam, Abhinav and Sang, Joseph and Kwon, Il},
+  date = {2022},
+  journaltitle = {International Journal of Control},
+  pages = {1--12},
+  publisher = {{Taylor \& Francis}},
+  abstract = {In this work, a predictive control framework is presented for feedback stabilization of nonlinear systems. To achieve this, we integrate Koopman operator theory with Lyapunov-based model predictive control (LMPC). The main idea is to transform nonlinear dynamics from state-space to function space using Koopman eigenfunctions-for control affine systems this results in a bilinear model in the (lifted) function space. Then, a predictive controller is formulated in Koopman eigenfunction coordinates which uses an auxiliary Control Lyapunov Function (CLF) based bounded controller as a constraint to ensure stability of the Koopman system in the function space. Provided there exists a continuously differentiable inverse mapping between the original state-space and (lifted) function space, we show that the designed controller is capable of translating the feedback stabiliz-ability of the Koopman bilinear system to the original nonlinear system. Remarkably, the feedback control design proposed in this work remains completely data-driven and does not require any explicit knowledge of the original system. Furthermore, due to the bilinear structure of the Koopman model, seeking a CLF is no longer a bottleneck for LMPC. Benchmark numerical examples demonstrate the utility of the proposed feedback control design.},
+  keywords = {con-trol Lyapunov functions,feedback stabilization,Index Terms-Koopman operator,model predictive control}
 }
 
 @unpublished{natarajan_Interleaving_2021,
@@ -2636,6 +3006,24 @@
   file = {/home/brian/Zotero/storage/94YUUV9N/Osa et al. - 2017 - Guiding Trajectory Optimization by Demonstrated Di.pdf;/home/brian/Zotero/storage/XHDZWWUX/7819469.html}
 }
 
+@article{paige_LSQR_1982,
+  title = {{{LSQR}}: {{An Algorithm}} for {{Sparse Linear Equations}} and {{Sparse Least Squares}}},
+  shorttitle = {{{LSQR}}},
+  author = {Paige, Christopher C. and Saunders, Michael A.},
+  date = {1982-03},
+  journaltitle = {ACM Transactions on Mathematical Software},
+  shortjournal = {ACM Trans. Math. Softw.},
+  volume = {8},
+  number = {1},
+  pages = {43--71},
+  issn = {0098-3500, 1557-7295},
+  doi = {10.1145/355984.355989},
+  url = {https://dl.acm.org/doi/10.1145/355984.355989},
+  urldate = {2022-06-14},
+  langid = {english},
+  file = {/home/brian/Zotero/storage/P6C6QZSE/Paige and Saunders - 1982 - LSQR An Algorithm for Sparse Linear Equations and.pdf}
+}
+
 @inproceedings{pan_GPUbased_2019,
   title = {{{GPU-based}} Contact-Aware Trajectory Optimization Using a Smooth Force Model},
   booktitle = {Proceedings of the 18th Annual {{ACM SIGGRAPH}}/{{Eurographics Symposium}} on {{Computer Animation}}},
@@ -2690,6 +3078,19 @@
   archiveprefix = {arXiv},
   keywords = {Benchmark testing,Computer Science - Robotics,direct transcription evaluation,discretization nodes,Dynamics,initialization strategies,integration scheme,interior point method,IPM,Mathematics - Optimization and Control,nonlinear optimization methods,Optimization,Optimization and Optimal Control,Optimization and Optimal Control;,path planning,Planning,problem complexity,quadratic programming,Robot motion,robot motion planning,robots,sequential quadratic programming,SQP,Trajectory,trajectory control,trajectory optimization,underactuated nonminimal-phase ball-balancing robot,Underactuated Robots},
   file = {/home/brian/Zotero/storage/KJPZMEBJ/Pardo et al. - 2016 - Evaluating direct transcription and nonlinear opti.pdf;/home/brian/Zotero/storage/YL9SF36R/Pardo et al. - 2016 - Evaluating Direct Transcription and Nonlinear Opti.pdf;/home/brian/Zotero/storage/8ESF6SZD/7400956.html;/home/brian/Zotero/storage/VYXFECR6/1504.html}
+}
+
+@article{parikh_Proximal_2014,
+  title = {Proximal {{Algorithms}}},
+  author = {Parikh, Neal},
+  date = {2014},
+  journaltitle = {Foundations and Trends® in Optimization},
+  volume = {1},
+  number = {3},
+  pages = {127--239},
+  doi = {10.1561/2400000003},
+  abstract = {Thismonograph is about a class of optimization algorithms called prox- imal algorithms.Much like Newton’s method is a standard tool for solv- ing unconstrained smooth optimization problems of modest size, proxi- mal algorithms can be viewed as an analogous tool for nonsmooth, con- strained, large-scale, or distributed versions of these problems. They are very generally applicable, but are especially well-suited to problems of substantial recent interest involving large or high-dimensional datasets. Proximal methods sit at a higher level of abstraction than classical al- gorithms like Newton’s method: the base operation is evaluating the proximal operator of a function, which itself involves solving a small convex optimization problem. These subproblems, which generalize the problem of projecting a point onto a convex set, often admit closed- form solutions or can be solved very quickly with standard or simple specialized methods. Here, we discuss the many different interpreta- tions of proximal operators and algorithms, describe their connections to many other topics in optimization and applied mathematics, survey some popular algorithms, and provide a large number of examples of proximal operators that commonly arise in practice.},
+  file = {/home/brian/Zotero/storage/V8HQMWIY/prox_algs.pdf}
 }
 
 @article{park_Distributed_2019,
@@ -2749,6 +3150,21 @@
   abstract = {A general-purpose MATLAB software program called GPOPS--II is described for solving multiple-phase optimal control problems using variable-order Gaussian quadrature collocation methods. The software employs a Legendre-Gauss-Radau quadrature orthogonal collocation method where the continuous-time optimal control problem is transcribed to a large sparse nonlinear programming problem (NLP). An adaptive mesh refinement method is implemented that determines the number of mesh intervals and the degree of the approximating polynomial within each mesh interval to achieve a specified accuracy. The software can be interfaced with either quasi-Newton (first derivative) or Newton (second derivative) NLP solvers, and all derivatives required by the NLP solver are approximated using sparse finite-differencing of the optimal control problem functions. The key components of the software are described in detail and the utility of the software is demonstrated on five optimal control problems of varying complexity. The software described in this article provides researchers a useful platform upon which to solve a wide variety of complex constrained optimal control problems.},
   keywords = {applied mathematics,direct collocation,Gaussian quadrature,hp--adaptive methods,hp–adaptive methods,MATLAB,numerical methods,Optimal control,scientific computation},
   file = {/home/brian/Zotero/storage/YSDPLTYG/Patterson and Rao - 2014 - GPOPS-II A MATLAB Software for Solving Multiple-P.pdf}
+}
+
+@article{peitz_Datadriven_2020,
+  title = {Data-Driven Model Predictive Control Using Interpolated Koopman Generators},
+  author = {Peitz, Sebastian and Otto, Samuel E. and Rowley, Clarence W.},
+  date = {2020},
+  journaltitle = {SIAM Journal on Applied Dynamical Systems},
+  volume = {19},
+  number = {3},
+  pages = {2162--2193},
+  publisher = {{Society for Industrial and Applied Mathematics Publications}},
+  doi = {10.1137/20M1325678},
+  url = {https://doi.org/10.1137/20M1325678},
+  abstract = {In recent years, the success of the Koopman operator in dynamical systems analysis has also fueled the development of Koopman operator-based control frameworks. In order to preserve the relatively low data requirements for an approximation via dynamic mode decomposition, a quantization approach was recently proposed in [S. Peitz and S. Klus, Automatica J. IFAC, 106 (2019), pp. 184- 191]. This way, control of nonlinear dynamical systems can be realized by means of switched systems techniques, using only a finite set of autonomous Koopman operator-based reduced models. These individual systems can be approximated very efficiently from data. The main idea is to transform a control system into a set of autonomous systems for which the optimal switching sequence has to be computed. In this article, we extend these results to continuous control inputs using relaxation. This way, we combine the advantages of the data efficiency of approximating a finite set of autonomous systems with continuous controls, as the data requirements increase only linearly with the input dimension. We show that when using the Koopman generator, this relaxation-realized by linear interpolation between two operators-does not introduce any error for control affine systems. This allows us to control high-dimensional nonlinear systems using bilinear, low-dimensional surrogate models. The efficiency of the proposed approach is demonstrated using several examples with increasing complexity, from the Duffing oscillator to the chaotic fluidic pinball.},
+  keywords = {Dynamic mode decomposition,Koopman operator,Model predictive control,optimal control,Optimal control,reduced order modeling,Reduced order modeling}
 }
 
 @book{pellegrini_Applications_2017,
@@ -2890,6 +3306,21 @@
   file = {/home/brian/Zotero/storage/IR8ELPLD/Posa et al. - 2016 - Optimization and stabilization of trajectories for.pdf;/home/brian/Zotero/storage/MS7XJ7WW/7487270.html}
 }
 
+@article{proctor_Generalizing_2018,
+  title = {Generalizing Koopman Theory to Allow for Inputs and Control},
+  author = {Proctor, Joshua L. and Brunton, Steven L. and Nathan Kutz, J.},
+  date = {2018},
+  journaltitle = {SIAM Journal on Applied Dynamical Systems},
+  volume = {17},
+  number = {1},
+  pages = {909--930},
+  publisher = {{Society for Industrial and Applied Mathematics Publications}},
+  doi = {10.1137/16M1062296},
+  url = {http://www.siam.org/journals/siads/17-1/M106229.html},
+  abstract = {We develop a new generalization of Koopman operator theory that incorporates the effects of inputs and control. Koopman spectral analysis is a theoretical tool for the analysis of nonlinear dynamical systems. Moreover, Koopman is intimately connected to dynamic mode decomposition (DMD), a method that discovers coherent, spatio-temporal modes from data, connects local-linear analysis to nonlinear operator theory, and importantly creates an equation-free architecture for the study of complex systems. For actuated systems, standard Koopman analysis and DMD are incapable of producing input-output models; moreover, the dynamics and the modes will be corrupted by external forcing. Our new theoretical developments extend Koopman operator theory to allow for systems with nonlinear input-output characteristics. We show how this generalization is rigorously connected to a recent development called dynamic mode decomposition with control. We demonstrate this new theory on nonlinear dynamical systems, including a standard susceptible-infectious-recovered model with relevance to the analysis of infectious disease data with mass vaccination (actuation).},
+  keywords = {DMD,DMDc,input-output,Input-output,Koopman,Spatio-temporal,spatio-temporal AMS subject classifications 65P99}
+}
+
 @article{quirynen_Numerical_2017,
   title = {Numerical {{Simulation Methods}} for {{Embedded Optimization}}},
   author = {Quirynen, Rien},
@@ -3017,6 +3448,19 @@
   date = {1840}
 }
 
+@article{rodriguez_Benchmarking_2018,
+  title = {Benchmarking {{ADMM}} in Nonconvex {{NLPs}}},
+  author = {Rodriguez, Jose S. and Nicholson, Bethany and Laird, Carl and Zavala, Victor M.},
+  date = {2018-11},
+  journaltitle = {Computers \& Chemical Engineering},
+  volume = {119},
+  pages = {315--325},
+  publisher = {{Pergamon}},
+  doi = {10.1016/J.COMPCHEMENG.2018.08.036},
+  abstract = {We study connections between the alternating direction method of multipliers (ADMM), the classical method of multipliers (MM), and progressive hedging (PH). The connections are used to derive benchmark metrics and strategies to monitor and accelerate convergence and to help explain why ADMM and PH are capable of solving complex nonconvex NLPs. Specifically, we observe that ADMM is an inexact version of MM and approaches its performance when multiple coordination steps are performed. In addition, we use the observation that PH is a specialization of ADMM and borrow Lyapunov function and primal-dual feasibility metrics used in ADMM to explain why PH is capable of solving nonconvex NLPs. This analysis also highlights that specialized PH schemes can be derived to tackle a wider range of stochastic programs and even other problem classes. Our exposition is tutorial in nature and seeks to to motivate algorithmic improvements and new decomposition strategies},
+  keywords = {ADMM,Augmented Lagrangian,Coordination,Decomposition,Large-scale,NLP}
+}
+
 @article{rogers_Robust_2013,
   title = {Robust {{Parafoil Terminal Guidance Using Massively Parallel Processing}}},
   author = {Rogers, Jonathan and Slegers, Nathan},
@@ -3047,6 +3491,14 @@
   file = {/home/brian/Zotero/storage/2CNBEBS5/Rösmann et al. - 2013 - Efficient trajectory optimization using a sparse m.pdf;/home/brian/Zotero/storage/JQSAN2VH/6698833.html}
 }
 
+@report{royer_NewtonCG_2018,
+  title = {A {{Newton-CG Algorithm}} with {{Complexity Guarantees}} for {{Smooth Unconstrained Optimization}}},
+  author = {Royer, Clément W and O'neill, Michael and Wright, Stephen J and Royer, C W and O'neill, M and Wright, S J},
+  date = {2018},
+  abstract = {We consider minimization of a smooth nonconvex objective function using an iterative algorithm based on Newton's method and the linear conjugate gradient algorithm, with explicit detection and use of negative curvature directions for the Hessian of the objective function. The algorithm tracks Newton-conjugate gradient procedures developed in the 1980s closely, but includes enhancements that allow worst-case complexity results to be proved for convergence to points that satisfy approximate first-order and second-order optimality conditions. The complexity results match the best known results in the literature for second-order methods.},
+  keywords = {Classification,Mathematics,smooth nonconvex optimization ·,Subject}
+}
+
 @article{ruszczynski_Convergence_1995,
   title = {On Convergence of an Augmented {{Lagrangian}} Decomposition Method for Sparse Convex Optimization},
   author = {Ruszczyński, Andrzej},
@@ -3072,6 +3524,24 @@
   abstract = {Many nonlinear systems of practical interest evolve on Lie groups or on manifolds acted upon by Lie groups. Examples range from aircraft and underwater vehicles to quantum mechanical systems. In this paper, we develop an algorithm for solving continuous-time optimal control problems for systems evolving on (noncompact) Lie groups. This algorithm generalizes the projection operator approach for trajectory optimization originally developed for systems on vector spaces. Notions for generalizing system theoretic tools such as Riccati equations and linear and quadratic system approximations are developed. In this development, the covariant derivative of a map between two manifolds plays a key role in providing a chain rule for the required Lie group computations. An example optimal control problem on SO(3) is provided to highlight implementation details and to demonstrate the effectiveness of the method.},
   keywords = {Aerospace electronics,approximation theory,continuous time systems,continuous-time optimal control problems,Differential geometry,geometric approaches,Lie group computations,Lie groups,linear system approximation,Manifolds,map covariant derivative,mathematical operators,nonlinear control systems,nonlinear systems,optimal control,Optimal control,optimisation,Optimization,projection operator approach,quadratic system approximation,Riccati equations,system theoretic tools,Trajectory,trajectory optimization,Vectors},
   file = {/home/brian/Zotero/storage/3RJSYT49/Saccon et al. - 2013 - Optimal Control on Lie Groups The Projection Oper.pdf;/home/brian/Zotero/storage/GLVVKHBC/Saccon et al. - 2013 - Optimal Control on Lie Groups The Projection Oper.pdf;/home/brian/Zotero/storage/5U87JCAP/6504478.html}
+}
+
+@inbook{sayed_Recursive_2009,
+  title = {Recursive {{Least-Squares Adaptive Filters}}},
+  booktitle = {Digital {{Signal Processing Fundamentals}}},
+  author = {Sayed, Ali and Kailath, Thomas},
+  date = {2009-11-20},
+  series = {Electrical {{Engineering Handbook}}},
+  volume = {20094251},
+  pages = {1--40},
+  publisher = {{CRC Press}},
+  doi = {10.1201/9781420046076-c21},
+  url = {http://www.crcnetbase.com/doi/abs/10.1201/9781420046076-c21},
+  urldate = {2022-06-15},
+  bookauthor = {Madisetti, Vijay},
+  isbn = {978-1-4200-4606-9 978-1-4200-4607-6},
+  langid = {english},
+  file = {/home/brian/Zotero/storage/D68H5W6E/Sayed and Kailath - 2009 - Recursive Least-Squares Adaptive Filters.pdf}
 }
 
 @article{schaub_STEREOGRAPHIC_,
@@ -3288,6 +3758,25 @@
   file = {/home/brian/Zotero/storage/Y4D3MN3K/Stellato et al. - 2020 - OSQP an operator splitting solver for quadratic p.pdf}
 }
 
+@incollection{strobach_Recursive_1990,
+  title = {Recursive {{Least-Squares Using}} the {{QR Decomposition}}},
+  booktitle = {Linear {{Prediction Theory}}: {{A Mathematical Basis}} for {{Adaptive Systems}}},
+  author = {Strobach, Peter},
+  editor = {Strobach, Peter},
+  date = {1990},
+  series = {Springer {{Series}} in {{Information Sciences}}},
+  pages = {63--101},
+  publisher = {{Springer}},
+  location = {{Berlin, Heidelberg}},
+  doi = {10.1007/978-3-642-75206-3_4},
+  url = {https://doi.org/10.1007/978-3-642-75206-3_4},
+  urldate = {2022-06-15},
+  abstract = {In Chap. 3, we treated the nonrecursive solution of the Normal Equations as a batch processing least-squares problem. In many applications, like recursive identification and adaptive filtering, we are interested in a recursive solution of the Normal Equations such that given the solution at time t−1, we may compute the updated version of this solution at time t upon the arrival of new data. Algorithms of this type are known as recursive least-squares (RLS) algorithms. As mentioned in Chap. 2, we can exploit the recursive properties of the Normal Equations, which we have discussed, to derive recursive O(p2) or even fast recursive O(p) algorithms for calculating the updated solution of the Normal Equations at consecutive time steps of observation.},
+  isbn = {978-3-642-75206-3},
+  langid = {english},
+  keywords = {CORDIC Algorithm,Observation Matrix,Systolic Array,Triangular Array,Triangular Form}
+}
+
 @article{stuelpnagel_Parametrization_1964,
   title = {On the {{Parametrization}} of the {{Three-Dimensional Rotation Group}}},
   author = {Stuelpnagel, John.},
@@ -3302,6 +3791,34 @@
   url = {https://epubs.siam.org/doi/abs/10.1137/1006093},
   urldate = {2020-01-09},
   file = {/home/brian/Zotero/storage/7QMJNSEZ/Stuelpnagel - 1964 - On the Parametrization of the Three-Dimensional Ro.pdf;/home/brian/Zotero/storage/PXXWGHGA/Stuelpnagel - 1964 - On the Parametrization of the Three-Dimensional Ro.pdf;/home/brian/Zotero/storage/PGFNK6SP/1006093.html}
+}
+
+@article{subosits_Racetrack_2019,
+  title = {From the Racetrack to the Road: {{Real-time}} Trajectory Replanning for Autonomous Driving},
+  author = {Subosits, John K. and Gerdes, J. Christian},
+  date = {2019-06},
+  journaltitle = {IEEE Transactions on Intelligent Vehicles},
+  volume = {4},
+  number = {2},
+  pages = {309--320},
+  publisher = {{Institute of Electrical and Electronics Engineers Inc.}},
+  doi = {10.1109/TIV.2019.2904390},
+  abstract = {In emergency situations, autonomous vehicles will be forced to operate at their friction limits in order to avoid collisions. In these scenarios, coordinating the planning of the vehicle's path and speed gives the vehicle the best chance of avoiding an obstacle. Fast reaction time is also important in an emergency, but approaches to the trajectory planning problem based on nonlinear optimization are computationally expensive. This paper presents a new scheme that simultaneously modifies the desired path and speed profile for a vehicle in response to the appearance of an obstacle, significant tracking error, or other environmental change. By formulating the trajectory optimization problem as a quadratically constrained quadratic program, solution times of less than 20 ms are possible even with a 10-s planning horizon. A simplified point mass model is used to describe the vehicle's motion, but the incorporation of longitudinal weight transfer and road topography means that the vehicle's acceleration limits are modeled more accurately than in comparable approaches. Experimental data from an autonomous vehicle in two scenarios demonstrate how the trajectory planner enables the vehicle to avoid an obstacle even when the obstacle appears suddenly and the vehicle is already operating near the friction limits.},
+  keywords = {Autonomous vehicles,intelligent vehicles,quadratic programming,trajectory optimization,vehicle dynamics,vehicle safety}
+}
+
+@article{suh_Surprising_2020,
+  title = {The {{Surprising Effectiveness}} of {{Linear Models}} for {{Visual Foresight}} in {{Object Pile Manipulation}}},
+  author = {Suh, H. J.Terry and Tedrake, Russ},
+  date = {2020-02},
+  journaltitle = {Springer Proceedings in Advanced Robotics},
+  volume = {17},
+  pages = {347--363},
+  publisher = {{Springer Science and Business Media B.V.}},
+  doi = {10.48550/arxiv.2002.09093},
+  url = {https://arxiv.org/abs/2002.09093v3},
+  abstract = {In this paper, we tackle the problem of pushing piles of small objects into a desired target set using visual feedback. Unlike conventional single-object manipulation pipelines, which estimate the state of the system parametrized by pose, the underlying physical state of this system is difficult to observe from images. Thus, we take the approach of reasoning directly in the space of images, and acquire the dynamics of visual measurements in order to synthesize a visual-feedback policy. We present a simple controller using an image-space Lyapunov function, and evaluate the closed-loop performance using three different class of models for image prediction: deep-learning-based models for image-to-image translation, an object-centric model obtained from treating each pixel as a particle, and a switched-linear system where an action-dependent linear map is used. Through results in simulation and experiment, we show that for this task, a linear model works surprisingly well – achieving better prediction error, downstream task performance, and generalization to new environments than the deep models we trained on the same amount of data. We believe these results provide an interesting example in the spectrum of models that are most useful for vision-based feedback in manipulation, considering both the quality of visual prediction, as well as compatibility with rigorous methods for control design and analysis. Project site: https://sites.google.com/view/linear-visual-foresight/home},
+  keywords = {Deformable Objects,Image Prediction,Manipulation,Piles of Objects,Vision-based Control,Visual Foresight}
 }
 
 @article{sun_Rate_2008,
@@ -3320,6 +3837,15 @@
   abstract = {We analyze the rate of local convergence of the augmented Lagrangian method in nonlinear semidefinite optimization. The presence of the positive semidefinite cone constraint requires extensive tools such as the singular value decomposition of matrices, an implicit function theorem for semismooth functions, and variational analysis on the projection operator in the symmetric matrix space. Without requiring strict complementarity, we prove that, under the constraint nondegeneracy condition and the strong second order sufficient condition, the rate of convergence is linear and the ratio constant is proportional to 1/c, where c is the penalty parameter that exceeds a threshold \$\$\textbackslash overline\{c\} {$>$} 0\$\$.},
   langid = {english},
   file = {/home/brian/Zotero/storage/JPW8FREE/Sun et al. - 2008 - The rate of convergence of the augmented Lagrangia.pdf}
+}
+
+@book{surana_Koopman_2016,
+  title = {Koopman Operator Based Observer Synthesis for Control-Affine Nonlinear Systems; {{Koopman}} Operator Based Observer Synthesis for Control-Affine Nonlinear Systems},
+  author = {Surana, Amit},
+  date = {2016},
+  doi = {10.1109/CDC.2016.7799268},
+  abstract = {We propose a new observer form based on Koop-man operator theoretic framework for input-output nonlinear systems with control affine inputs. Based on this observer form, we describe an observer synthesis framework which exploits estimation techniques developed for Lipschitz systems and bilinear systems. We also formulate nonlinear observability rank condition in terms of the Koopman observer form, and numerically illustrate the benefits of the proposed framework.},
+  isbn = {978-1-5090-1837-6}
 }
 
 @article{tang_Aggressive_2018,
@@ -3395,6 +3921,15 @@
   url = {https://drake.mit.edu/}
 }
 
+@article{teng_ErrorState_2022,
+  title = {An {{Error-State Model Predictive Control}} on {{Connected Matrix Lie Groups}} for {{Legged Robot Control}}},
+  author = {Teng, Sangli and Chen, Dianhao and Clark, William and Ghaffari, Maani},
+  date = {2022-03},
+  doi = {10.48550/arxiv.2203.08728},
+  url = {https://arxiv.org/abs/2203.08728v1},
+  abstract = {This paper reports on a new error-state Model Predictive Control (MPC) approach on connected matrix Lie groups for robot control. The linearized tracking error dynamics and the linearized equations of motion are derived in the Lie algebra. Moreover, given an initial condition, the linearized tracking error dynamics and equations of motion are globally valid and evolve independently of the system trajectory. By exploiting the symmetry of the problem, the proposed approach shows faster convergence of rotation and position simultaneously than the state-of-the-art geometric variational MPC based on variational-based linearization. Numerical simulation on tracking control of a fully-actuated 3D rigid body dynamics confirms the benefits of the proposed approach compared to the baselines. Furthermore, the proposed MPC is also verified in pose control and locomotion experiments on a quadrupedal robot MIT Mini Cheetah.}
+}
+
 @software{tennessee_ScaLAPACK_,
   title = {{{ScaLAPACK}} - Scalable Linear Algebra {{PACKage}}},
   author = {of Tennessee, University and University of California, Berkeley and Denver, University of Colorado and Ltd., NAG},
@@ -3446,7 +3981,7 @@
   abstract = {We describe a new physics engine tailored to model-based control. Multi-joint dynamics are represented in generalized coordinates and computed via recursive algorithms. Contact responses are computed via efficient new algorithms we have developed, based on the modern velocity-stepping approach which avoids the difficulties with spring-dampers. Models are specified using either a high-level C++ API or an intuitive XML file format. A built-in compiler transforms the user model into an optimized data structure used for runtime computation. The engine can compute both forward and inverse dynamics. The latter are well-defined even in the presence of contacts and equality constraints. The model can include tendon wrapping as well as actuator activation states (e.g. pneumatic cylinders or muscles). To facilitate optimal control applications and in particular sampling and finite differencing, the dynamics can be evaluated for different states and controls in parallel. Around 400,000 dynamics evaluations per second are possible on a 12-core machine, for a 3D homanoid with 18 dofs and 6 active contacts. We have already used the engine in a number of control applications. It will soon be made publicly available.},
   eventtitle = {2012 {{IEEE}}/{{RSJ International Conference}} on {{Intelligent Robots}} and {{Systems}}},
   keywords = {12-core machine,3D humanoid,active contacts,actuator activation states,application program interfaces,built-in compiler transforms,C++ language,Computational modeling,control engineering computing,data structures,Dynamics,Engines,finite difference methods,finite differencing,Heuristic algorithms,high-level C++ API,humanoid robots,intuitive XML file format,Mathematical model,model-based control,MuJoCo,multijoint dynamics,optimal control,optimal control applications,Optimization,optimized data structure,physics engine,program compilers,recursive algorithms,runtime computation,shock absorbers,spring-dampers,tendon wrapping,velocity-stepping approach,XML},
-  file = {/home/brian/Zotero/storage/CDP56XJR/Todorov et al. - 2012 - MuJoCo A physics engine for model-based control.pdf;/home/brian/Zotero/storage/XFAN6I9B/Todorov et al. - 2012 - MuJoCo A physics engine for model-based control.pdf;/home/brian/Zotero/storage/3SNG5F3H/6386109.html}
+  file = {/home/brian/Zotero/storage/CDP56XJR/Todorov et al. - 2012 - MuJoCo A physics engine for model-based control.pdf;/home/brian/Zotero/storage/UI76TCLR/Todorov et al. - 2012 - MuJoCo A physics engine for model-based control.pdf;/home/brian/Zotero/storage/XFAN6I9B/Todorov et al. - 2012 - MuJoCo A physics engine for model-based control.pdf;/home/brian/Zotero/storage/3SNG5F3H/6386109.html;/home/brian/Zotero/storage/BYRMG6RW/6386109.html}
 }
 
 @unpublished{toussaint_Novel_2014,
@@ -3601,6 +4136,14 @@
   publisher = {{IEEE}}
 }
 
+@article{wang_Deep_2021,
+  title = {Deep Koopman Data-Driven Optimal Control Framework for Autonomous Racing},
+  author = {Wang, Rongyao and Han, Yiqiang and Vaidya, Umesh},
+  date = {2021},
+  journaltitle = {Early Access},
+  volume = {5}
+}
+
 @unpublished{wang_Fast_2021,
   title = {Fast {{Parallel Newton-Raphson Power Flow Solver}} for {{Large Number}} of {{System Calculations}} with {{CPU}} and {{GPU}}},
   author = {Wang, Zhenqi and Berg, Sebastian Wende-von and Braun, Martin},
@@ -3681,6 +4224,21 @@
   eventtitle = {2016 {{IEEE International Conference}} on {{Robotics}} and {{Automation}} ({{ICRA}})},
   keywords = {aggressive driving,control engineering computing,cost criteria,Entropy,fifth-scale auto-rally vehicle,free energy notion,GPU,graphics processing unit,graphics processing units,importance sampling,importance sampling scheme,information theoretic notion,model predictive path integral control,nonlinear control systems,nonlinear systems optimization,optimal control,Optimal control,Prediction algorithms,predictive control,Q measurement,relative entropy notion,road traffic control,road vehicles,stochastic optimal control framework,Stochastic processes,Trajectory,Vehicles},
   file = {/home/brian/Zotero/storage/XJFQNVC9/Williams et al. - 2016 - Aggressive driving with model predictive path inte.pdf}
+}
+
+@article{williams_Data_2015,
+  title = {A {{Data}}–{{Driven Approximation}} of the {{Koopman Operator}}: {{Extending Dynamic Mode Decomposition}}},
+  author = {Williams, Matthew O. and Kevrekidis, Ioannis G. and Rowley, Clarence W.},
+  date = {2015-12},
+  journaltitle = {Journal of Nonlinear Science},
+  volume = {25},
+  number = {6},
+  pages = {1307--1346},
+  publisher = {{Springer New York LLC}},
+  doi = {10.1007/S00332-015-9258-5/FIGURES/14},
+  url = {https://link.springer.com/article/10.1007/s00332-015-9258-5},
+  abstract = {The Koopman operator is a linear but infinite-dimensional operator that governs the evolution of scalar observables defined on the state space of an autonomous dynamical system and is a powerful tool for the analysis and decomposition of nonlinear dynamical systems. In this manuscript, we present a data-driven method for approximating the leading eigenvalues, eigenfunctions, and modes of the Koopman operator. The method requires a data set of snapshot pairs and a dictionary of scalar observables, but does not require explicit governing equations or interaction with a “black box” integrator. We will show that this approach is, in effect, an extension of dynamic mode decomposition (DMD), which has been used to approximate the Koopman eigenvalues and modes. Furthermore, if the data provided to the method are generated by a Markov process instead of a deterministic dynamical system, the algorithm approximates the eigenfunctions of the Kolmogorov backward equation, which could be considered as the “stochastic Koopman operator” (Mezic in Nonlinear Dynamics 41(1–3): 309–325, 2005). Finally, four illustrative examples are presented: two that highlight the quantitative performance of the method when presented with either deterministic or stochastic data and two that show potential applications of the Koopman eigenfunctions.},
+  keywords = {Data mining,Koopman spectral analysis,Reduced order models,Set oriented methods,Spectral methods}
 }
 
 @unpublished{williams_Model_2015,
@@ -3774,6 +4332,22 @@
   archiveprefix = {arXiv},
   keywords = {Computer Science - Robotics},
   file = {/home/brian/Zotero/storage/C7VTDTAH/Xie and Dellaert - 2020 - A Unified Method for Solving Inverse, Forward, and.pdf;/home/brian/Zotero/storage/DIQW6RDV/1911.html}
+}
+
+@article{xu_Adaptive_2017,
+  title = {Adaptive {{ADMM}} with {{Spectral Penalty Parameter Selection}}},
+  author = {Xu, Zheng and Figueiredo, Mário A.T. T and Goldstein, Tom},
+  date = {2017},
+  journaltitle = {Proceedings of the 20th International Conference on Artificial Intelligence and Statistics, AISTATS 2017},
+  publisher = {{PMLR}},
+  url = {http://proceedings.mlr.press/v54/xu17a.html},
+  abstract = {The alternating direction method of multi-pliers (ADMM) is a versatile tool for solving a wide range of constrained optimization problems. However, its performance is highly sensitive to a penalty parameter, making ADMM often unreliable and hard to automate for a non-expert user. We tackle this weakness of ADMM by proposing a method that adaptively tunes the penalty parameter to achieve fast convergence. The resulting adaptive ADMM (AADMM) algorithm, inspired by the successful Barzilai-Borwein spectral method for gradient descent, yields fast convergence and relative insensitivity to the initial stepsize and problem scaling.}
+}
+
+@article{xu_Empirical_,
+  title = {An {{Empirical Study}} of {{ADMM}} for {{Nonconvex Problems}}},
+  author = {Xu, Zheng and De, Soham and Figueiredo, Mário A T and Studer, Christoph and Goldstein, Tom},
+  abstract = {The alternating direction method of multipliers (ADMM) is a common optimization tool for solving constrained and non-differentiable problems. We provide an empirical study of the practical performance of ADMM on several nonconvex applications, including 0 regularized linear regression, 0 regularized image de-noising, phase retrieval, and eigenvector computation. Our experiments suggest that ADMM performs well on a broad class of non-convex problems. Moreover, recently proposed adaptive ADMM methods, which automatically tune penalty parameters as the method runs, can improve algorithm efficiency and solution quality compared to ADMM with a non-tuned penalty.}
 }
 
 @article{xu_Optimization_2016,
