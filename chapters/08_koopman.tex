@@ -2,50 +2,8 @@
 
 \usepackage[export]{adjustbox}
 
-\newcommand{\changed}[1]{{\color{black} #1}}
-
-% Bibliography
-% \usepackage[style=ieee,doi=false,isbn=false,url=false,eprint=false]{biblatex}
-% \AtEveryBibitem{\clearlist{language}}  % remove language field from bib entries
-% \addbibresource{references.bib}
-% \renewcommand*{\bibfont}{\small}
-
-% \title{
-%   Data-Efficient Model Learning for Model Predictive Control with
-%   Jacobian-Regularized Dynamic Mode Decomposition
-% }
-
-% \author{
-% Brian E. Jackson \\
-% Robotics Institute \\
-% Carnegie Mellon University \\
-% \texttt{brianjackson@cmu.edu} \\
-% \and
-% Jeong Hun Lee \\
-% Robotics Institute \\
-% Carnegie Mellon University \\
-% \texttt{jeonghunlee@cmu.edu} \\
-% \and
-% Kevin Tracy \\
-% Robotics Institute \\
-% Carnegie Mellon University \\
-% \texttt{ktracy@cmu.edu} \\
-% \and
-% Zachary Manchester \\
-% Robotics Institute \\
-% Carnegie Mellon University \\
-% \texttt{zacm@cmu.edu} \\
-% }
-
 \begin{document}
 
-% Combining the benefits of data-driven and model-based control techniques for nonlinear
-% dynamics systems has many potential advantages. Compared to purely data-driven approaches,
-% this could include benefits such as increasing sampling efficiency, reducing training
-% time, or increasing generalization. For purely model-based approaches such as
-% model-predictive control, this could in- crease robustness to model uncertainty or improve
-% overall performance by adapt- ing the controller based on observations from the real
-% system. 
 \chapter{
   Data-Efficient Model Learning for Model Predictive Control with
   Jacobian-Regularized Dynamic Mode Decomposition
@@ -133,78 +91,80 @@ Lyapunov control techniques with bilinear Koopman
 \end{itemize}
 
 The remainder of the paper is organized as follows: In Section
-\ref{sec:Preliminaries/Background} we provide some background on the application of Koopman
-operator theory to controlled dynamical systems and review some related works.  Section
-\ref{sec:jdmd} then describes the proposed JDMD algorithm.  In Section \ref{sec:rls} we
-outline a memory-efficient technique for solving the large, sparse linear least-squares
-problems that arise when applying JDMD and other DMD-based algorithms.  
-% Next, in Section \ref{sec:projected_mpc}, we propose an efficient model-predictive control technique that
-% utilizes the learned bilinear models produced by JDMD.  
-Section \ref{sec:results} then
-provides simulation results and analysis of the proposed algorithm applied to control tasks
-on a cartpole, 
-a quadrotor, and a small foam airplane \changed{with an experimentally determined aerodynamics model}, 
-all subject to significant model mismatch. 
-\changed{It also includes a comparison of the current approach to model-learning via a multi-layer
-perceptron, for the canonical cartpole problem.} 
-In Section \ref{sec:limitations} we discuss the limitations of our approach,
-followed by some concluding remarks in Section \ref{sec:conclusion}.
+\ref{sec:Preliminaries/Background} we provide some background on the application
+of Koopman operator theory to controlled dynamical systems and review some
+related works.  Section \ref{sec:jdmd} then describes the proposed JDMD
+algorithm.  In Section \ref{sec:rls} we outline a memory-efficient technique for
+solving the large, sparse linear least-squares problems that arise when applying
+JDMD and other DMD-based algorithms.  
+% Next, in Section \ref{sec:projected_mpc}, we propose an efficient
+% model-predictive control technique that utilizes the learned bilinear models
+% produced by JDMD.  
+Section \ref{sec:results} then provides simulation results and analysis of the
+proposed algorithm applied to control tasks on a cartpole, a quadrotor, and a
+small foam airplane \changed{with an experimentally determined aerodynamics
+model}, all subject to significant model mismatch.  \changed{It also includes a
+comparison of the current approach to model-learning via a multi-layer
+perceptron, for the canonical cartpole problem.} In Section
+\ref{sec:limitations} we discuss the limitations of our approach, followed by
+some concluding remarks in Section \ref{sec:conclusion}.
 
 \section{Background and Related Work} \label{sec:Preliminaries/Background}
 
 \subsection{Koopman Operator Theory}
 
-The theoretical underpinnings of the Koopman operator and its application to dynamical
-systems has been extensively studied 
-\cite{fasel_SINDy_2021,proctor_Generalizing_2018,bruder_Advantages_2021,williams_Data_2015,surana_Koopman_2016} 
-Rather than describe the theory in detail, we highlight the key concepts employed by the
-current work and refer the reader to the existing literature on Koopman theory for further
-details.
+The theoretical underpinnings of the Koopman operator and its application to
+dynamical systems has been extensively studied 
+\cite{fasel_SINDy_2021,proctor_Generalizing_2018,bruder_Advantages_2021,williams_Data_2015,surana_Koopman_2016}
+Rather than describe the theory in detail, we highlight the key concepts
+employed by the current work and refer the reader to the existing literature on
+Koopman theory for further details.
 
 We start by assuming a controlled, nonlinear, discrete-time dynamical system,
 \begin{equation} \label{eq:discrete_dynamics} 
   x^+ = f(x, u), 
 \end{equation} 
-where $x \in \mathcal{X} \subseteq \R^{N_x}$ is the state vector, $u_k \in \R^{N_u}$ is the
-control vector, and $x^+$ is the state at the next time step. \changed{Assuming the dynamics
-are control-affine, the nonlinear finite-dimensional system \eqref{eq:discrete_dynamics}
-can be represented \emph{exactly} by an infinite-dimensional bilinear system through the
-Koopman canonical transform \cite{Surana2016}. This bilinear Koopman model follows the form,}
+where $x \in \mathcal{X} \subseteq \R^{N_x}$ is the state vector, $u_k \in
+\R^{N_u}$ is the control vector, and $x^+$ is the state at the next time step.
+\changed{Assuming the dynamics are control-affine, the nonlinear
+finite-dimensional system \eqref{eq:discrete_dynamics} can be represented
+\emph{exactly} by an infinite-dimensional bilinear system through the Koopman
+canonical transform \cite{surana_Koopman_2016}. This bilinear Koopman model follows the
+form,}
 \begin{equation} \label{eq:bilinear_dynamics}
   y^+ = A y + B u + \sum_{i=1}^m u_i C_i y = g(y,u) ,
 \end{equation}
-where $y = \phi(x)$ is a nonlinear mapping from the finite-dimensional state space
-$\mathcal{X}$ to the infinite-dimensional Hilbert space of \textit{observables}
-$\mathcal{Y}$.  In practice, we approximate \eqref{eq:bilinear_dynamics} by restricting
-$\mathcal{Y}$ to be a finite-dimensional vector space, in which case $\phi$ becomes a
-finite-dimensional nonlinear function of the state variables, \changed{which can be either chosen 
-heurstically based on domain expertise, or learned
+where $y = \phi(x)$ is a nonlinear mapping from the finite-dimensional state
+space $\mathcal{X}$ to the infinite-dimensional Hilbert space of
+\textit{observables} $\mathcal{Y}$.  In practice, we approximate
+\eqref{eq:bilinear_dynamics} by restricting $\mathcal{Y}$ to be a
+finite-dimensional vector space, in which case $\phi$ becomes a
+finite-dimensional nonlinear function of the state variables, \changed{which can
+be either chosen heurstically based on domain expertise, or learned
 \cite{folkestad_Extended_2020,folkestad_KoopNet_2022,li_Extended_2017}}.
 
-Intuitively, $\phi$ ``lifts'' our state $x$ into a higher dimensional space $\mathcal{Y}$
-where the dynamics are approximately (bi)linear, effectively trading dimensionality for
-(bi)linearity. Similarly, we can perform an ``unlifting'' operation by projecting a lifted state
-$y$ back into the original state space $\mathcal{X}$. In this work, 
-\changed{since we embed the original state within the nonlinear mapping 
+Intuitively, $\phi$ ``lifts'' our state $x$ into a higher dimensional space
+$\mathcal{Y}$ where the dynamics are approximately (bi)linear, effectively
+trading dimensionality for (bi)linearity. Similarly, we can perform an
+``unlifting'' operation by projecting a lifted state $y$ back into the original
+state space $\mathcal{X}$. In this work, \changed{since we embed the original
+state within the nonlinear mapping 
 \cite{bruder_Advantages_2021,folkestad_Koopman_2021,mamakoukas_Local_2019,huang_Feedback_2018,ma_Optimal_2019}
-}, 
-$\phi$ is constructed in such a way that this unlifting is linear:
+}, $\phi$ is constructed in such a way that this unlifting is linear:
 \begin{equation}
 	x = G y.
 \end{equation}
-\changed{We note that our proposed method does not rely on this assumption: any mapping could be used. The 
-problem of finding an optimal mapping is itself a major area of research, and many recent studies have focused
-on jointly learning both the model and the mapping
+\changed{We note that our proposed method does not rely on this assumption: any
+mapping could be used. The problem of finding an optimal mapping is itself a
+major area of research, and many recent studies have focused on jointly learning
+both the model and the mapping
 \cite{folkestad_Extended_2020,folkestad_KoopNet_2022,wang_Deep_2021,kaiser_Datadriven_2021,
-li_Extended_2017}.
-While clearly advantageous, learning
-an optimal embedding is orthogonal to the main focus of the current paper, which focuses on a straightforward
-way of incorporating analytical derivative information from an approximate model, which is equally applicable
-whether the embedding function is learned or chosen heuristically.
-The mappings in the current work are chosen heuristically based on problem insight and experience.}
-
-%This idea should be both unsurprising and familiar to most roboticists, since similar techniques have already been employed in other forms, such as maximal-coordinate representations of rigid body dynamics \cite{Baraff,Brudigam2021a,Howell2022}, the ``kernel trick'' for state-vector machines \cite{Hofmann2006}, or the observation that solving large, sparse nonlinear optimization problems is often more effective than solving small, tightly-coupled dense problems.
-% \todo{add citations from the trajectory optimization literature}.
+li_Extended_2017}.  While clearly advantageous, learning an optimal embedding is
+orthogonal to the main focus of the current paper, which focuses on a
+straightforward way of incorporating analytical derivative information from an
+approximate model, which is equally applicable whether the embedding function is
+learned or chosen heuristically.  The mappings in the current work are chosen
+heuristically based on problem insight and experience.}
 
 \subsection{Extended Dynamic Mode Decomposition} \label{sec:edmd}
 
@@ -238,8 +198,6 @@ The model learning problem can then be written as the following linear least-squ
 approaches like the ``kernel trick'' used in support vector machines
 \cite{kutz_Dynamic_2016}, but extends these ideas to bilinear models of
 controlled dynamical systems.}
-%In practice, it is simply performing (bi)linear regression on the ``features'' specified by the nonlinear mapping $\phi$ in order to approximate the lower-dimensional nonlinear dynamics.}
-%where $Z_{1:P} \in \R^{N_z \times P}$ and $Y_{1:P}^+ \in \R^{N_y \times P}$ are the data matrices and $N_z = N_y + N_u + N_y \cdot N_u$.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -913,60 +871,78 @@ dynamics.
     \begin{subfigure}{\linewidth}
         \centering
         \includegraphics[width=0.6\textwidth,height=4cm]{koopman/airplane_error_by_num_train.tikz}
-        \caption{\changed{Sample efficiency for the airplane perching problem. JDMD learns the model with only 10 training trajectories, whereas EDMD requires about 35. Both models perform significantly better than nominal MPC due to significant model mismatch at high angles of attack.}}
+        \caption{\changed{Sample efficiency for the airplane perching problem.
+        JDMD learns the model with only 10 training trajectories, whereas EDMD
+        requires about 35. Both models perform significantly better than nominal
+        MPC due to significant model mismatch at high angles of attack.}}
         \label{fig:airplane_sample_efficiency}
     \end{subfigure}
     \caption{\changed{Results on the airplane perching task}}
     \label{fig:test}
 \end{figure}
 
-\changed{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Model Prediction Error vs. Controller Performance}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Much of the previous literature on model learning focuses on open-loop dynamics prediction error. While 
-intuitive, we argue that this is a poor metric when the end goal is closed-loop control performance. In Figure
-\ref{fig:model_error_alpha} we show that decreasing confidence in the analytical model (by increasing $\alpha$)
-increases open-loop dynamics prediction error significantly while having minimal impact on closed loop performance below $\alpha = 0.7$. We found we can often quickly find models ``good enough'' for control with just a few training trajectories (typically with a higher value of $\alpha$), that predicted the open-loop dynamics very poorly. For example, in Fig. \ref{fig:model_error_alpha} at the extremes of $\alpha = 0$ (EDMD) and 
-$\alpha \geq 0.8$, the open-loop predictions were unstable and diverged, while the closed-loop system still 
-successfully tracked the reference trajectory. This also extends to the MLP example, where MPC tracking performance does not correlate to minimizing loss in the training and test process as seen in Fig. \ref{fig:cartpole_train}. In addition, JDMD matches the Jacobians of that of the nominal model (which has some Jacobian error from the true model), while EDMD has significant Jacobian error as shown in Fig. \ref{fig:airplane_jacobian_error}. This further demonstrates the importance of Jacobians over open-loop dynamics prediction in a closed-loop control setting, which may be unsurprising due to the presence of the Jacobians in the feedback-policy of closed-loop controllers. 
-}
+Much of the previous literature on model learning focuses on open-loop dynamics
+prediction error. While intuitive, we argue that this is a poor metric when the
+end goal is closed-loop control performance. In Figure
+\ref{fig:model_error_alpha} we show that decreasing confidence in the analytical
+model (by increasing $\alpha$) increases open-loop dynamics prediction error
+significantly while having minimal impact on closed loop performance below
+$\alpha = 0.7$. We found we can often quickly find models ``good enough'' for
+control with just a few training trajectories (typically with a higher value of
+$\alpha$), that predicted the open-loop dynamics very poorly. For example, in
+Fig. \ref{fig:model_error_alpha} at the extremes of $\alpha = 0$ (EDMD) and 
+$\alpha \geq 0.8$, the open-loop predictions were unstable and diverged, while
+the closed-loop system still successfully tracked the reference trajectory. This
+also extends to the MLP example, where MPC tracking performance does not
+correlate to minimizing loss in the training and test process as seen in Fig.
+\ref{fig:cartpole_train}. In addition, JDMD matches the Jacobians of that of the
+nominal model (which has some Jacobian error from the true model), while EDMD
+has significant Jacobian error as shown in Fig.
+\ref{fig:airplane_jacobian_error}. This further demonstrates the importance of
+Jacobians over open-loop dynamics prediction in a closed-loop control setting,
+which may be unsurprising due to the presence of the Jacobians in the
+feedback-policy of closed-loop controllers. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Limitations 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Limitations} \label{sec:limitations}
 
-\changed{Many of the limitations of the proposed approach derive from the limitations of
-Koopman approaches more broadly. Foremost among these is the sensitivity of performance to the selections 
-of the nonlinear mapping and respective unlifting operation; the current study has not 
-investigated the incorporation of the proposed method in methods which jointly learn both the 
-model and the nonlinear mapping, although the extension should be fairly straightforward. 
-In addition, the bilinear Koopman model
-assumes the original, nonlinear dynamics to be control-affine, limiting its application
-to broad dynamical systems in general.
-Another significant limitation of the current work is lack of demonstration on hardware,
-something we plan to remedy in the future. Better, in-depth comparisons of the given
-approach to other approaches beyond a simple MLP would also be enlightening, which were
-left out due to scope limitations. Additionally, while the presented single rigid-body
-systems such as a quadrotor or airplane have similar dimensionality to many autonomous
-systems of interest, extensions to systems with many degrees of freedom may be difficult
-computationally, given derivative information grows with the square of the state dimension.
-In addition, the relationship between closed-loop performance and open-loop dynamics prediction 
-error should be studied futher, given we have demonstrated good MPC performance
-that has not translated directly to model prediction error.} 
-As with most data-driven techniques, it is difficult to claim that our
-method will increase performance in all cases. It is possible that having an extremely poor
-prior model may hurt rather than help the training process. However, we found that even
-when the $\alpha$ parameter is extremely small (placing little weight on the Jacobians 
-during the learning process), it still dramatically improves the sample efficiency over 
-standard EDMD. It is also quite possible that the performance gaps between EDMD and JDMD
-shown here can be reduced through better selection of basis functions and better training
-data sets; however, given that the proposed approach converges to EDMD as $\alpha
-\rightarrow 0$, we see no reason to not adopt the proposed methodology and simply tune
-$\alpha$ based on the confidence of the model and the quantity (and quality) of training
-data. 
+\changed{Many of the limitations of the proposed approach derive from the
+limitations of Koopman approaches more broadly. Foremost among these is the
+sensitivity of performance to the selections of the nonlinear mapping and
+respective unlifting operation; the current study has not investigated the
+incorporation of the proposed method in methods which jointly learn both the 
+model and the nonlinear mapping, although the extension should be fairly
+straightforward.  In addition, the bilinear Koopman model assumes the original,
+nonlinear dynamics to be control-affine, limiting its application to broad
+dynamical systems in general.  Another significant limitation of the current
+work is lack of demonstration on hardware, something we plan to remedy in the
+future. Better, in-depth comparisons of the given approach to other approaches
+beyond a simple MLP would also be enlightening, which were left out due to scope
+limitations. Additionally, while the presented single rigid-body systems such as
+a quadrotor or airplane have similar dimensionality to many autonomous systems
+of interest, extensions to systems with many degrees of freedom may be difficult
+computationally, given derivative information grows with the square of the state
+dimension.  In addition, the relationship between closed-loop performance and
+open-loop dynamics prediction error should be studied futher, given we have
+demonstrated good MPC performance that has not translated directly to model
+prediction error.} As with most data-driven techniques, it is difficult to claim
+that our method will increase performance in all cases. It is possible that
+having an extremely poor prior model may hurt rather than help the training
+process. However, we found that even when the $\alpha$ parameter is extremely
+small (placing little weight on the Jacobians during the learning process), it
+still dramatically improves the sample efficiency over standard EDMD. It is also
+quite possible that the performance gaps between EDMD and JDMD shown here can be
+reduced through better selection of basis functions and better training data
+sets; however, given that the proposed approach converges to EDMD as $\alpha
+\rightarrow 0$, we see no reason to not adopt the proposed methodology and
+simply tune $\alpha$ based on the confidence of the model and the quantity (and
+quality) of training data. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Conclusion 
