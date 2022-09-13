@@ -1,0 +1,9 @@
+
+\begin{tikzpicture}[every node/.style={draw,circle}]
+    \graph [layered layout, grow=down] {
+        4 [draw=blue] -- 2 [draw=green] -- 1 [draw=red];
+                            2 [draw=green] -- 3 [draw=red];
+        4 [draw=blue] -- 6 [draw=green] -- 5 [draw=red];
+                            6 [draw=green] -- 7 [draw=red];
+    };
+\end{tikzpicture}

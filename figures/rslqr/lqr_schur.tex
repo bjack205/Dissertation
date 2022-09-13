@@ -1,0 +1,96 @@
+\documentclass[tikz]{standalone}
+
+\usepackage{transparent}
+\usepackage{nicematrix}
+\usetikzlibrary{matrix, fit}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{positioning}
+\usetikzlibrary{decorations.pathreplacing}
+
+\newlength{\mycellheight}
+\newlength{\innermargin}
+\newlength{\cornerrad}
+\newlength{\vsep}
+\newlength{\msep}  % Offset from center
+\newlength{\hsep}  % Offset between blocks
+\newlength{\thirdlevelsep}
+
+\newcommand{\0}{{\transparent{0} \resizebox{\mycellheight}{\mycellheight}{0}}}
+
+\begin{document}
+\begin{tikzpicture}
+    
+    \setlength{\mycellheight}{1.0em}
+    \setlength{\innermargin}{-0.2em}
+    \setlength{\cornerrad}{1.5pt}
+    \setlength{\vsep}{1.2cm}
+    \setlength{\msep}{0.7cm}
+    \setlength{\hsep}{4.5cm}
+    % \setlength{\thirdlevelsep}{\vsep/2}
+
+    { \tiny
+    \matrix[matrix of math nodes, left delimiter={[}, right delimiter={]}] (m) 
+    {
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+        \0&\0&\0&\0&\0&\0&\0&\0&\0&\0&\0\\
+    };
+    }
+
+    \begin{scope}[on background layer]
+        \foreach \x/\y in {1/2,4/5,7/8,10/11} {
+            \node[fit=(m-\x-\x)(m-\y-\y), draw=orange, fill=orange, rounded corners=\cornerrad, inner sep=\innermargin] (AC\x) {};
+        }
+        \foreach \x/\y/\z in {1/2/3, 7/8/9} {
+            \node[fit=(m-\x-\z)(m-\y-\z), draw=red, fill=red, rounded corners=\cornerrad, inner sep=\innermargin] (D\x_1) {};
+            \node[fit=(m-\z-\x)(m-\z-\y), draw=red, fill=red, rounded corners=\cornerrad, inner sep=\innermargin] (Dt\x_1) {};
+            \node[fit=(m-\z-\z)(m-\z-\z), draw=red, fill=red, rounded corners=\cornerrad, inner sep=\innermargin] (B\x_1) {};
+        }
+        \foreach \z/\x/\y in {3/4/5, 9/10/11} {
+            \node[fit=(m-\x-\z)(m-\y-\z), draw=red, fill=red, rounded corners=\cornerrad, inner sep=\innermargin] (E\x_1) {};
+            \node[fit=(m-\z-\x)(m-\z-\y), draw=red, fill=red, rounded corners=\cornerrad, inner sep=\innermargin] (Et\x_1) {};
+        }
+        \node[fit=(m-1-6)(m-5-6), draw=green, fill=green, rounded corners=\cornerrad, inner sep=\innermargin] (D1_2) {};
+        \node[fit=(m-6-1)(m-6-5), draw=green, fill=green, rounded corners=\cornerrad, inner sep=\innermargin] (Dt1_2) {};
+        \node[fit=(m-7-6)(m-11-6), draw=green, fill=green, rounded corners=\cornerrad, inner sep=\innermargin] (E1_2) {};
+        \node[fit=(m-6-7)(m-6-11), draw=green, fill=green, rounded corners=\cornerrad, inner sep=\innermargin] (Et1_2) {};
+        \node[fit=(m-6-6)(m-6-6), draw=green, fill=green, rounded corners=\cornerrad, inner sep=\innermargin] (B1_2) {};
+
+        \node[fit=(m-1-1)(m-5-5),   draw=green!00!black, very thick, rounded corners=\cornerrad, inner sep=0em] {};
+        \node[fit=(m-7-7)(m-11-11), draw=green!00!black, very thick, rounded corners=\cornerrad, inner sep=0em] {};
+        \node[fit=(m-10-6)(m-11-6), draw=red, very thick, rounded corners=\cornerrad, inner sep=0em] {};
+
+    \end{scope}
+    \foreach \x/\y/\k in {1/2/1,4/5/2,7/8/3,10/11/4} {
+        \node[fit=(m-\x-\x), text height=8pt] {\footnotesize $Q_{\k}$};
+        \node[fit=(m-\y-\y), text height=8pt] {\footnotesize $R_{\k}$};
+    }
+    \node[fit=(m-1-3), text height=10pt] {\footnotesize $\hat{A}_1^T$};
+    \node[fit=(m-2-3), text height=10pt] {\footnotesize $\hat{B}_1^T$};
+    \node[fit=(m-4-3), text height=10pt] {\footnotesize $-I$};
+    \node[fit=(m-4-6), text height=10pt] {\footnotesize $\hat{A}_2^T$};
+    \node[fit=(m-5-6), text height=10pt] {\footnotesize $\hat{B}_2^T$};
+    \node[fit=(m-7-6), text height=10pt] {\footnotesize $-I$};
+    \node[fit=(m-7-9), text height=10pt] {\footnotesize $\hat{A}_3^T$};
+    \node[fit=(m-8-9), text height=10pt] {\footnotesize $\hat{B}_3^T$};
+    \node[fit=(m-10-9), text height=10pt] {\footnotesize $-I$};
+
+    \node[fit=(m-3-1), text height=10pt] {\footnotesize $\hat{A}_1$};
+    \node[fit=(m-3-2), text height=10pt] {\footnotesize $\hat{B}_1$};
+    \node[fit=(m-3-4), text height=10pt] {\footnotesize $-I$};
+    \node[fit=(m-6-4), text height=10pt] {\footnotesize $\hat{A}_2$};
+    \node[fit=(m-6-5), text height=10pt] {\footnotesize $\hat{B}_2$};
+    \node[fit=(m-6-7), text height=10pt] {\footnotesize $-I$};
+    \node[fit=(m-9-7), text height=10pt] {\footnotesize $\hat{A}_3$};
+    \node[fit=(m-9-8), text height=10pt] {\footnotesize $\hat{B}_3$};
+    \node[fit=(m-9-10), text height=10pt] {\footnotesize $-I$};
+\end{tikzpicture}
+\end{document}

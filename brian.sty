@@ -23,6 +23,12 @@
 \usepackage{subcaption}
 \usepackage{siunitx}
 \usepackage{xfrac}
+\usepackage{transparent}
+\usepackage{url}
+\Urlmuskip=0mu plus 1mu
+\usepackage{nicematrix}
+\NiceMatrixOptions{cell-space-limits = 2pt}
+\setcounter{MaxMatrixCols}{20}
 % \sisetup{output-exponent-marker=\ensuremath{\mathrm{e}}}
 
 % Plotting                                                                      
@@ -31,9 +37,16 @@
         legend style={font=\footnotesize},
 }
 \usepackage{tikzscale}
+\usepgfplotslibrary{fillbetween}
+\usepackage{tikz}
 \usetikzlibrary{pgfplots.statistics}
 \usetikzlibrary{external}
-\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{positioning}
+\usetikzlibrary{matrix}
+\usetikzlibrary{shapes}
+\usetikzlibrary{fit}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{calc}
 % \usepgfplotslibrary{external}
 % \tikzexternalize
 % \tikzexternalize[prefix=tikz/]
@@ -44,6 +57,16 @@
 \newcommand{\zeros}{\mathbf{0}}
 \DeclareMathOperator{\sign}{sign}
 \newcommand{\degree}{^{\circ}}
+\newcommand{\x}{\times}
+
+% Algorithmic additions
+\algblock{ParFor}{EndParFor}
+\algnewcommand\algorithmicparfor{\textbf{parfor}}
+\algnewcommand\algorithmicpardo{\textbf{do}}
+\algnewcommand\algorithmicendparfor{\textbf{end\ parfor}}
+\algrenewtext{ParFor}[1]{\algorithmicparfor\ #1\ \algorithmicpardo}
+\algrenewtext{EndParFor}{\algorithmicendparfor}
+\algrenewcommand\algorithmicindent{1.5em}%
 
 % Misc
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}

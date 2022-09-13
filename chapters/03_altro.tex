@@ -22,7 +22,7 @@ and weaknesses. In summary, direct collocation methods for trajectory
 optimization parameterize both the states and controls as decision variables
 and solve \eqref{opt:discrete_trajopt} using general-purpose nonlinear
 programming (NLP) solvers such as SNOPT \cite{gill_SNOPT_2005} or Ipopt
-\cite{wachter_implementation_2006}, and tend to be versatile and robust. It
+\cite{wachter_Implementation_2006}, and tend to be versatile and robust. It
 is straight forward to provide an initial state trajectory to the solver in
 such methods, even if it is dynamically infeasible. Direct collocation with
 Hermite-Simpson integration is by far the most common direct collocation
@@ -47,11 +47,11 @@ constraints on the states \cite{xie_Differential_2017,lin_Differential_1991}
 have been handled by solving a
 constrained quadratic program (QP) at each step of the backward pass. A
 projection method was devised that satisfies linearized terminal state and
-stage state-input constraints \cite{giftthaler_projection_2017}. Augmented Lagrangian
+stage state-input constraints \cite{giftthaler_Projection_2017}. Augmented Lagrangian
 methods (ALM) have been proposed \cite{plancher_Constrained_2017}, including hybrid
 approaches that also solve constrained QPs for stage state-input constraints
 \cite{lantoine_Hybrid_,lin_Differential_1991}. Mixed state-input constraints have also been
-handled using a penalty method \cite{farshidian_efficient_2017}.
+handled using a penalty method \cite{farshidian_Efficient_2017}.
 
 Of these methods, those leveraging ALM have shown promise, given the ease of
 implemenation, fast convergence, and the ability to handle generic state and

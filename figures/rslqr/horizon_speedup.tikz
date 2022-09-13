@@ -1,0 +1,84 @@
+\begin{tikzpicture}
+\begin{axis}[xlabel={time horizon}, ylabel={Speedup vs Riccati}, ymode={log}, log ticks with fixed point, grid={major}, ytick={0.1,1.0,2.0,4.0,8.0,16.0,32.0}, legend style={at={(0.5,-0.3)}, anchor=north, draw=none}, legend columns={5}, transpose legend]
+    \addplot+[color={rgb,1:red,0.1216;green,0.4667;blue,0.7059}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.096985  \\
+            16.0  0.24996  \\
+            32.0  0.67957  \\
+            64.0  1.82331  \\
+            128.0  4.75423  \\
+            256.0  12.05175  \\
+            512.0  29.81575  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,1.0;green,0.498;blue,0.0549}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.075285  \\
+            16.0  0.11105  \\
+            32.0  0.210815  \\
+            64.0  0.49675  \\
+            128.0  1.22948  \\
+            256.0  3.05386  \\
+            512.0  7.49486  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,0.1725;green,0.6275;blue,0.1725}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.075285  \\
+            16.0  0.10175  \\
+            32.0  0.159215  \\
+            64.0  0.28888  \\
+            128.0  0.655245  \\
+            256.0  1.567435  \\
+            512.0  3.787935  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,0.8392;green,0.1529;blue,0.1569}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.075285  \\
+            16.0  0.10175  \\
+            32.0  0.128215  \\
+            64.0  0.16398  \\
+            128.0  0.251345  \\
+            256.0  0.46051  \\
+            512.0  1.015635  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,0.5804;green,0.4039;blue,0.7412}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.075285  \\
+            16.0  0.10175  \\
+            32.0  0.128215  \\
+            64.0  0.15468  \\
+            128.0  0.181145  \\
+            256.0  0.23551  \\
+            512.0  0.372475  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,0.549;green,0.3373;blue,0.2941}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.075285  \\
+            16.0  0.10175  \\
+            32.0  0.128215  \\
+            64.0  0.15468  \\
+            128.0  0.181145  \\
+            256.0  0.20761  \\
+            512.0  0.234075  \\
+        }
+        ;
+    \draw[dashed, color={black}] ({rel axis cs:1,0}|-{axis cs:0,1}) -- ({rel axis cs:0,0}|-{axis cs:0,1});
+    \legend{{rsLQR(8)},{rsLQR(32)},{rsLQR(64)},{rsLQR(256)},{rsLQR(1024)},{rsLQR(4096)}}
+\end{axis}
+\end{tikzpicture}

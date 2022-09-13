@@ -1,0 +1,89 @@
+\begin{tikzpicture}
+\begin{axis}[xlabel={knot points}, ylabel={solve time (ms)}, ymin={0}, ymax={100}, legend style={at={(0.5,-0.3)}, anchor=north, draw=none}, legend columns={3}]
+    \addplot+[very thick, no marks, solid, color={rgb,1:red,0.894;green,0.102;blue,0.11}]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.3677695  \\
+            16.0  0.78292  \\
+            32.0  1.61516  \\
+            64.0  3.2609945  \\
+            128.0  6.583347  \\
+            256.0  13.2155465  \\
+            512.0  26.409117  \\
+            1024.0  52.982117  \\
+        }
+        ;
+    \addplot+[very thick, no marks, solid, color={rgb,1:red,0.216;green,0.494;blue,0.722}]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.253897  \\
+            16.0  0.524395  \\
+            32.0  1.0744895  \\
+            64.0  2.1232285  \\
+            128.0  4.291374  \\
+            256.0  8.6854405  \\
+            512.0  18.9649305  \\
+            1024.0  41.194366  \\
+        }
+        ;
+    \addplot+[very thick, no marks, solid, color={rgb,1:red,0.302;green,0.686;blue,0.29}]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.0641425  \\
+            16.0  0.1365315  \\
+            32.0  0.281134  \\
+            64.0  0.639571  \\
+            128.0  1.1707785  \\
+            256.0  2.327626  \\
+            512.0  4.7129665  \\
+            1024.0  9.505862  \\
+        }
+        ;
+    \addplot+[very thick, no marks, solid, color={rgb,1:red,0.596;green,0.306;blue,0.639}]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  1.313417  \\
+            16.0  4.013196  \\
+            32.0  5.8513485  \\
+            64.0  5.1730635  \\
+            128.0  5.8737165  \\
+            256.0  9.234122  \\
+            512.0  17.78876  \\
+            1024.0  40.0994625  \\
+        }
+        ;
+    \addplot+[very thick, no marks, solid, color={rgb,1:red,1.0;green,0.498;blue,0.0}]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.600796  \\
+            16.0  1.111304  \\
+            32.0  2.129531  \\
+            64.0  4.105362  \\
+            128.0  8.169867  \\
+            256.0  16.334884  \\
+            512.0  32.79561  \\
+            1024.0  65.370813  \\
+        }
+        ;
+    \addplot+[very thick, no marks, solid, color={rgb,1:red,0.969;green,0.506;blue,0.749}]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  1.1626805  \\
+            16.0  1.9104485  \\
+            32.0  3.0550895  \\
+            64.0  6.3663355  \\
+            128.0  12.615391  \\
+            256.0  25.152025  \\
+            512.0  51.2031305  \\
+            1024.0  107.933952  \\
+        }
+        ;
+    \legend{{Riccati},{SuiteSparse},{QDLDL},{rsLQR(64)},{MA86(64)},{Pardiso(64)},{pardiso}}
+\end{axis}
+\end{tikzpicture}

@@ -1,0 +1,96 @@
+\begin{tikzpicture}
+\begin{axis}[xlabel={time horizon}, ymin={0}, ymax={16}, legend style={at={(0.5,-0.3)}, anchor=north, draw=none}, legend columns={3}, grid={major}]
+    \addplot+[line width={2pt}, color={black}, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.344456  \\
+            16.0  0.688912  \\
+            32.0  1.377824  \\
+            64.0  2.755648  \\
+            128.0  5.511296  \\
+            256.0  11.022592  \\
+            512.0  22.045184  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,0.1216;green,0.4667;blue,0.7059}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.20573  \\
+            16.0  0.539896  \\
+            32.0  1.483874  \\
+            64.0  4.007402  \\
+            128.0  10.494162  \\
+            256.0  26.68421  \\
+            512.0  66.171602  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,1.0;green,0.498;blue,0.0549}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.15918  \\
+            16.0  0.237034  \\
+            32.0  0.455616  \\
+            64.0  1.086498  \\
+            128.0  2.708188  \\
+            256.0  6.7557  \\
+            512.0  16.627548  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,0.1725;green,0.6275;blue,0.1725}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.15918  \\
+            16.0  0.215964  \\
+            32.0  0.340368  \\
+            64.0  0.627648  \\
+            128.0  1.438493  \\
+            256.0  3.462249  \\
+            512.0  8.398173  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,0.8392;green,0.1529;blue,0.1569}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.15918  \\
+            16.0  0.215964  \\
+            32.0  0.272748  \\
+            64.0  0.350602  \\
+            128.0  0.543704  \\
+            256.0  1.009442  \\
+            512.0  2.243423  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,0.5804;green,0.4039;blue,0.7412}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.15918  \\
+            16.0  0.215964  \\
+            32.0  0.272748  \\
+            64.0  0.329532  \\
+            128.0  0.386316  \\
+            256.0  0.50631  \\
+            512.0  0.809172  \\
+        }
+        ;
+    \addplot+[color={rgb,1:red,0.549;green,0.3373;blue,0.2941}, very thick, solid, no marks]
+        table[row sep={\\}]
+        {
+            \\
+            8.0  0.15918  \\
+            16.0  0.215964  \\
+            32.0  0.272748  \\
+            64.0  0.329532  \\
+            128.0  0.386316  \\
+            256.0  0.4431  \\
+            512.0  0.499884  \\
+        }
+        ;
+    \legend{{riccati},{rsLQR(8)},{rsLQR(32)},{rsLQR(64)},{rsLQR(256)},{rsLQR(1024)},{rsLQR(4096)}}
+\end{axis}
+\end{tikzpicture}

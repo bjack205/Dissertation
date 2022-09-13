@@ -244,11 +244,11 @@ Important recent work in the field of robotics includes several works that
 came out of Russ Tedrake's lab at MIT around the 2015 DARPA robotics
 challenge, where they demonstrated 1kHz control on a 34 degree of freedom
 (DOF) humanoid using an active-set method that uses problem-specific
-heuristics to pick the active set \cite{kuindersma_efficiently_2014}. This
+heuristics to pick the active set \cite{kuindersma_Efficiently_2014}. This
 work then grew to include methods for ``contact-implicit'' trajectory
 optimization, where the optimization algorithm is free to pick the number and
 timing of contact interactions with the environment
-\cite{posa_direct_2014,posa_Optimization_2016,manchester_Variational_2017,
+\cite{posa_Direct_2014,posa_Optimization_2016,manchester_Variational_2017,
 patel_ContactImplicit_2019}. Another interesting extension to direct
 collocation provides improved tracking performance of the resulting
 trajectory given bounded uncertainties or disturbances
@@ -273,14 +273,14 @@ these methods have received very little attention in the robotics community.
 
 In contrast to methods based on direct transcription that typically rely on
 general-purpose NLP software such as SNOPT \cite{gill_SNOPT_2005}, Ipopt
-\cite{wachter_implementation_2006} or the Knitro solver by Artelys, DDP-based
+\cite{wachter_Implementation_2006} or the Knitro solver by Artelys, DDP-based
 methods solve for a locally-optimal feedback policy by optimizing only over
 the controls, maintaining strict dynamic feasibility by simulating the system
 forward using the locally-optimal feedback policy. DDP was originally
 introduced in 1966 \cite{mayne_Secondorder_1966} but was mostly ignored until
 the early 2000s when it was picked back up by the robotics community,
 deriving the well-known iterative LQR (iLQR) algorithm
-\cite{todorov_generalized_2005}. Taking a Gauss-Newton approach, iterative
+\cite{todorov_Generalized_2005}. Taking a Gauss-Newton approach, iterative
 LQR avoids the expense of calculating the second-order derivatives of the
 dynamics. Similar to most Gauss-Newton algorithms, iLQR tends to take more
 iterations but converge in overall less time than DDP. While fast and
@@ -289,10 +289,10 @@ ability to work with additional constraints beyond the dynamics constraints.
 Many methods were proposed over the years, including solving QPs at each time
 step to handle simple bounds on the inputs \cite{tassa_Controllimited_2014}
 or more general nonlinear constraints \cite{xie_Differential_2017},
-projection onto the linearized constraints \cite{giftthaler_projection_2017},
+projection onto the linearized constraints \cite{giftthaler_Projection_2017},
 or augmented Lagrangian methods \cite{plancher_Constrained_2017}. A
 derivative-free variant based on the unscented Kalman filter from the state
-estimation community was also proposed \cite{manchester_DerivativeFree_2016}.
+estimation community was also proposed \cite{manchester_Derivativefree_2016}.
 Most recently, the developers of the Pinocchio dynamics library
 \cite{carpentier_Pinocchio_2019} proposed a DDP solver that uses augmented Lagrangian
 methods to handle equality constraints, building off of previous work covered
@@ -310,7 +310,7 @@ family of such methods and demonstrate superior convergence for MPC problems
 approximation, i.e. iLQR. The application of multiple shooting with full DDP
 to aerospace problems was studied in a recent two-part paper out of
 University of Texas, Austin
-\cite{pellegrini_multipleshooting_2020,pellegrini_multipleshooting_2020a}.
+\cite{pellegrini_Multipleshooting_2020,pellegrini_Multipleshooting_2020a}.
 While both of these leveraged parallelism on a multi-core CPU, impressive
 performance gains have recently been demonstrated on other hardware
 accelerators, including GPUs and FPGAs \cite{plancher_Performance_2020}.
@@ -321,6 +321,6 @@ HRP-2 Humanoid was demonstrated using iLQR in 2015, a major breakthrough for
 the optimal control community \cite{koenemann_Wholebody_2015}. Since then,
 several labs have published papers demonstrating the successful application
 of variants of iLQR for quadupedal locomotion
-\cite{farshidian_efficient_2017,mastalli_Crocoddyl_2019,neunert_WholeBody_2018}.
+\cite{farshidian_Efficient_2017,mastalli_Crocoddyl_2019,neunert_WholeBody_2018}.
 
 \end{document}
