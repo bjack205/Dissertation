@@ -107,7 +107,7 @@ model}, all subject to significant model mismatch.  \changed{It also includes a
 comparison of the current approach to model-learning via a multi-layer
 perceptron, for the canonical cartpole problem.} In Section
 \ref{sec:limitations} we discuss the limitations of our approach, followed by
-some concluding remarks in Section \ref{sec:conclusion}.
+some concluding remarks in Section \ref{sec:koopman_conclusion}.
 
 \section{Background and Related Work} \label{sec:Preliminaries/Background}
 
@@ -717,7 +717,7 @@ where EDMD requires about 3x the number of samples (35 vs 10) compared to the pr
   the training trajectories.
   \changed{The median error is shown as a thick line, while the shaded regions represent the 5\% to 95\% 
   percentile bounds.}}
-  \label{fig:training_window}
+  % \label{fig:training_window}
 \end{figure}
 
 \begin{figure}
@@ -781,7 +781,7 @@ as shown in  Fig. \ref{fig:jdmd_full_quad_pointtopoint_with_waypoints}.}
 	\end{subfigure}
 	\caption{Point-to-point, test trajectory generation and example tracking performance of full, 6-DOF quadrotor. The test                trajectories generated include a wide scope of initial conditions beyond that of the training set, such as high                 position offset, large velocities, and near-inverted attitude. JDMD often had the best tracking performance while               successfully reaching the goal state, with a similar success rate as nominal MPC within a tighter distribution. 
 	}
-	\label{fig:training_window}
+	% \label{fig:training_window}
 \end{figure}
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -878,7 +878,7 @@ dynamics.
         \label{fig:airplane_sample_efficiency}
     \end{subfigure}
     \caption{\changed{Results on the airplane perching task}}
-    \label{fig:test}
+    % \label{fig:test}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -947,7 +947,7 @@ quality) of training data.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Conclusion 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Conclusions and Future Work} \label{sec:conclusion}
+\section{Conclusions and Future Work} \label{sec:koopman_conclusion}
 
 We have presented JDMD, a simple but powerful extension to EDMD that
 incorporates derivative information from an approximate prior model. We have

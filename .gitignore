@@ -1,3 +1,4 @@
+*.pdf
 *.aux
 *.bbl
 *.bcf
@@ -6,7 +7,6 @@
 *.lof
 *.lot
 *.out
-*.pdf
 *.run.xml
 *.toc
 *.log

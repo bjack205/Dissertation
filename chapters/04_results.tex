@@ -49,7 +49,7 @@ the next solve.
 We compare solve times while varying the state dimension $n$ in Fig.
 \ref{fig:state_dim_comp}, the control dimension $m$ in Fig.
 \ref{fig:control_dim_comp}, and the time horizon $N$ in Fig.
-\ref{fig:horizon_comp}. As expected, both ALTRO-C and OSQP demonstrate linear
+\ref{fig:osqp_horizon_comp}. As expected, both ALTRO-C and OSQP demonstrate linear
 scaling with respect to the horizon length, while ALTRO-C achieves
 significantly lower overall times. Both solvers exhibit polynomial scaling in
 the state and control dimensions, with ALTRO-C achieving better scaling with
@@ -82,9 +82,11 @@ OSQP has an advantage for systems with larger input dimensions.
         \centering
         \includegraphics[width=\columnwidth,height=6cm]{altro_mpc/horizon_comp.tikz}
         \caption{Time horizon ($N$)}
-        \label{fig:horizon_comp}
+        \label{fig:osqp_horizon_comp}
     \end{subfigure}
-    \caption{Comparison of ALTRO-C and OSQP as a function of a) state dimension ($N=21,m=2$), b) control dimension ($N=21,n=30$), and c) horizon length ($n=12,m=6$). The x-axis is labeled at the sampled sizes.}
+    \caption{Comparison of ALTRO-C and OSQP as a function of a) state dimension
+    ($N=21,m=2$), b) control dimension ($N=21,n=30$), and c) horizon length
+    ($n=12,m=6$). The x-axis is labeled at the sampled sizes.}
 \end{figure*}
 
 % % \begin{figure}
