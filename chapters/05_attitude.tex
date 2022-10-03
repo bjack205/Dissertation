@@ -772,7 +772,7 @@
         than the relatively slow-moving spacecraft.
     
 
-\section{Conclusions} \label{sec:conclusion}
+\section{Conclusion} \label{sec:attitude_conclusion}
     We have presented a general, unified method for optimization-based
     planning and control for rigid-body systems with arbitrary attitude using
     standard linear algebra and vector calculus. The application of this
@@ -791,9 +791,10 @@
     solve more challenging problems with higher performance than other
     algorithms.
 
-    In future work, we plan to apply ALTRO to real-time model-predictive
-    control problems for aerial vehicles like quadrotors and airships that
-    experience large attitude changes. The methods we have presented can also
+    % In future work, we plan to apply ALTRO to real-time model-predictive
+    % control problems for aerial vehicles like quadrotors and airships that
+    % experience large attitude changes. 
+    The methods we have presented can also
     be leveraged to adapt other classes of gradient or Newton-based
     algorithms to exploit the structure of 3D rotations. Future directions
     beyond trajectory optimization may include simulation and planning
@@ -801,6 +802,13 @@
     dynamics~\cite{brudigam_LinearTime_2020}, system-identification for complex
     multi-body systems and fixed-wing aircraft in post-stall conditions, and
     state estimation for spacecraft with sparse measurements.
+
+    While the ALTRO algorithm has demonstrated impressive performance on systems whose 
+    dynamics are accurately characterized by a few rigid bodies, the algorithm is inherently 
+    serial and doesn't map well to parallel processors, which can enable the computational
+    performance necessary to generate online motion plans for systems with many degrees of 
+    freedom. In the next two chapters we consider alternative approaches that expose 
+    parallelization and may be better suited to these types of systems.
 
 
 \end{document}

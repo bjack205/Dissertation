@@ -14,7 +14,8 @@
 
 \begin{document}
 
-\chapter{A Parallel Linear System Solver for Optimal Control}
+\chapter{A Parallel Linear System Solver for Optimal Control} \label{chap:rslqr}
+\chaptermark{rsLQR}
 
 \lettrine{E}{fficent} linear system solvers are a critical component of
 numerical methods for solving optimal control problems.  Currently, most direct
@@ -1023,6 +1024,10 @@ algorithm onto the SIMD-style parallelism of a GPU would require significant mod
 synchronization requirements.  Future work will also investigate the performance benefits of
 integrating the proposed method into nonlinear trajectory optimization methods such as 
 direct collocation via sequential quadratic or convex programming. %, which includes extensions to the algorithm to allow for implicit integrators and path constraints.
+
+While this chapter focused on leveraging parallelization across the time domain, the next
+chapter considers a method for exposing parallelization across the spatial domain by 
+representing the dynamics of a multi-body mechanism in maximal coordinates.
 
 % \printbibliography
 

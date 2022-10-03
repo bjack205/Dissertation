@@ -346,12 +346,16 @@ small-to-medium-size MPC problems and is suitable for many real-time control
 applications. Additionally, unlike other specialized conic solvers, ALTRO-C
 can be readily applied to nonlinear and non-convex problems.
 
-Future work will investigate extending ALTRO-C to work with additional cones,
+Future work may investigate extending ALTRO-C to work with additional cones,
 including the semi-definite cone. Further benchmarking results against other
 state-of-the-art MPC solvers, such as the newly released HPIPM
 \cite{frison_HPIPM_2020}, are also left for future work. While the current
 Julia implementation offers significant benefits, a lightweight C
 implementation of the algorithm could also be useful for resource-constrained
-embedded applications.
+embedded applications. 
+
+The next chapter further extends ALTRO by proposing a straightforward method for 
+adapting Newton-based optimization methods to account for the group structure of 
+rotations, and concludes the work involving the ALTRO algorithm.
 
 \end{document}

@@ -139,7 +139,7 @@ is the linear velocity, and $\omega \in \R^3$ is the angular velocity.
 
 \subsubsection{Attitude Representation}
 
-This chapter uses the same notation proposed in Chapter \label{chap:attitude}, where the 
+This chapter uses the same notation proposed in Chapter \ref{chap:attitude}, where the 
 attitude is represented as a unit quaternion in Hamilton form:  
 \begin{equation}
     q = \begin{bmatrix}
@@ -627,9 +627,11 @@ norm constraints to the solver. The code for this project is available at
 
 The last two chapters of this dissertation shift focus to applications of optimization-based
 control methodologies, such as those presented in the first part of the dissertation. 
-Chapter \ref{chap:distributed} uses the ALTRO algorithm proposed in \ref{chap:altro}. 
+Chapter \ref{chap:distributed} uses the ALTRO algorithm proposed in Chapter \ref{chap:altro}
+in a distributed, parallel algorithm to solve a motion planning problem for a multi-agent 
+team-lift scenario, demonstrated on hardware. 
 In a separate vein, Chapter \ref{chap:jdmd} considers the impact of inaccurate models on 
-MPC performance, and suggests a straighforward method to improve MPC performance through by 
+MPC performance, and suggests a straightforward method to improve MPC performance by 
 updating approximate models using data from the real system.
 
 % \printbibliography

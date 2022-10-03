@@ -148,11 +148,10 @@ Our contributions are:
 \section{Outline}
 
 % TODO: Update this
-\todo{Update this section}
 In the following section we provide a survey of trajectory optimization and
 optimal control, focusing on the work done in the last 20 years. Part
 \ref{part:theory}, comprising Chapters
-\ref{chap:altro}-\ref{chap:attitude}, focuses on our theoretical and
+\ref{chap:altro}-\ref{chap:mctrajop}, focuses on our theoretical and
 algorithmic contributions to the field of optimal control. In Chapter
 \ref{chap:altro}, we provide an in-depth derivation of the ALTRO algorithm, along
 with the benchmarks results obtained in 2018 and published in
@@ -160,9 +159,16 @@ with the benchmarks results obtained in 2018 and published in
 describing extensions of the ALTRO algorithm to conic MPC problems,
 demonstrating state-of-the-art performance on a variety of convex and conic MPC 
 benchmark problems.
-Chapter \ref{chap:attitude} details a powerful and intuivive methodology 
+Chapter \ref{chap:attitude} details a powerful and intuitive methodology 
 for solving optimization problems for systems with 3D rotations, and includes
 details on adapting the ALTRO algorithm to natively handle unit quaternions. 
+The following two chapters consider algorithms that are better-suited to 
+leveraging parallel computation. Chapter \ref{chap:rsLQR} proposes a novel method direct 
+linear system that uses recursive Schur compliments to parallelize across the temporal 
+domain. Chapter \ref{chap:mctrajop} focuses instead on the spatial domain, considering the
+the feasibility of applying direct collocation in maximal coordinates using the Ipopt 
+solver, where parallelization is natural exposed across each body of a multi-body 
+system.
 
 Part \ref{part:application} focuses on applications of the theoretical and 
 algorithmic contributions of Part \ref{part:theory} to real systems. 
@@ -170,19 +176,13 @@ Chapter \ref{chap:distributed} describes a method for generating a
 motion plan for a team of quadrotors carrying a single, heavy load using 
 distributed trajectory optimization. Each of the distributed components 
 use ALTRO to solve the trajectory optimization problem. The method 
-is demonstrated in hardware.
+is demonstrated in hardware. The final chapter, Chapter \ref{chap:jdmd} addresses the 
+case where the nominal dynamics model is insufficient, and introduces a technique to 
+improve the tracking performance of convex MPC controllers by combining information from 
+an approximate model with data from the real system. Preliminary results are provided 
+in high-fidelity simulation environments. Concluding remarks are given in 
+\ref{chap:conclusion}.
 
-Part \ref{part:proposal} describes an overview of the proposed future work,
-building on the previous chapters. Chapter \ref{chap:blimp} proposes a novel
-method for a dynamics emulation platform for aerospace vehicles using agile
-quadrotors controlled with a trajectory optimization framework that makes the
-quadrotor approximate the dynamics of another system. Building off of some
-early work investigating the use of parallelization and distributed
-optimization in Chapter \ref{chap:distributed}, Chapter \ref{chap:parallel}
-proposes the development of new algorithms for gradient or Newton-based
-optimization that are naturally parallelizable and map well onto hardware
-accelerators like GPUs. Chapter \ref{chap:conclusion} provides a timeline of
-the proposed work, along with some brief concluding remarks.
 
 \section{Literature Review} \label{sec:lit_review}
 The field of optimal control has a long and rich history, beginning predominantly in the 

@@ -190,9 +190,15 @@ preliminary implementation demonstrates competitive---and often
 superior---performance on a number of benchmark motion-planning problems when
 compared to direct collocation implemented with the Ipopt solver. We find
 that ALTRO performs particularly well in comparison to DIRCOL on problems
-involving obstacles and high-dimensional state and input spaces. Future work
-will focus on improving runtime performance by taking advantage of problem
-sparsity and parallelization. Our implementation of ALTRO is available at
+involving obstacles and high-dimensional state and input spaces. 
+The following chapters provide additional extensions to the ALTRO algorithm: 
+Chapter \ref{chap:altro_c} adds support for conic constraints and demonstrates 
+state-of-the-art performance of the solver on convex MPC problems, including those 
+with second-order cone constraints. Chapter \ref{chap:attitude} proposes a straightforward
+methodology for adapting algorithms, like ALTRO, to natively account for the group structure
+of rotations, and examples are provided demonstrating the application of the modified 
+version of ALTRO to solve for high-angle maneuvers for a handful of aerospace applications.
+Our implementation of ALTRO is available at
 {\footnotesize
 \url{https://github.com/RoboticExplorationLab/Altro.jl}}.
 
