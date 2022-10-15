@@ -307,7 +307,7 @@ derivation.
     current iterate is far from the local optimum.
 
     The regularization is also increased if the partial Hessian in
-    \eqref{eq:gains} looses rank during the backward pass. In this case, the
+    \eqref{eq:gains} loses rank during the backward pass. In this case, the
     regularization term is increased and the backward pass is restarted from
     the beginning. The regularization is only decreased after a successful
     backward pass. The regularization scaling value is usually between 1.5
@@ -380,7 +380,9 @@ conditions is met:
     \begin{equation} \label{eq:penalty_update}
         \rho_{k_i}^+ = \phi \rho_{k_i},
     \end{equation}
-    where $\phi > 1$ is a scaling factor.
+    where $\phi > 1$ is a scaling factor. To avoid the ill-conditioning that 
+    occurs with arbitrarily high penalty values, the penalty is saturated at a 
+    maximum penalty, specified by the user (typically $10^8$).
 
     After experimenting with various different heuristic schemes for updating
     the multipliers and the penalty parameters, we have found that the most

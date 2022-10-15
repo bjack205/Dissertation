@@ -40,7 +40,7 @@ that discretize and optimize a single planned trajectory.
 
 While many autonomous systems of interest fall into the previously-mentioned category, many
 do not. Multi-body systems such as quadrupeds, humanoids, or robotic manipulators can easily
-have between 20-100 degrees of freedom. Moving into distriuted or multi-agent systems such
+have between 20-100 degrees of freedom. Moving into distributed or multi-agent systems such
 as power or communication networks, multi-agent teams \cite{jackson_Scalable_2020}, 
 satellite constellations, or swarms 
 of micro-robots, the dimensionality grows to hundreds of degrees of freedom. And for other
@@ -93,7 +93,7 @@ coordinates using discrete variational integrators. Representing rigid-body syst
 maximal coordinates has some appealing properties, namely that world or task-based goals 
 and constraints, such as the location of an end-effector for manipulation tasks, are 
 trivially expressed in maximal coordinates. Additionally, some recent studies have shown
-that local control methods such as LQR perform better in maximal coordinate
+that local control methods such as LQR perform better in maximal coordinates
 \cite{brudigam_LinearTime_2020,brudigam_LinearQuadratic_2021}.  Lastly, by treating a 
 mechanism as a finite set of individual rigid bodies linked together by joints, we can 
 achieve an extremely high degree of generality and potentially open the door for 
@@ -240,7 +240,7 @@ Rather than approximating the discrete dynamics by
 solving \eqref{opt:minaction} to get the Euler-Lagrange equation, which is then approximated
 using some integration method, we can instead discretize \eqref{opt:minaction} directly to 
 arrive at a discrete version of the Euler-Lagrange equation. This is the central idea behind
-discrete mechanics and varitational integrators. In the following section we step through 
+discrete mechanics and variational integrators. In the following section we step through 
 the derivation for a 2nd-order variational integrator for systems of rigid bodies.
 
 
@@ -269,7 +269,7 @@ this chapter, we will work only with revolute joints, whose pairwise constraint 
 \end{equation}
 where $p_1$ is the location of the joint the link 1 frame, $p_2$ is the location of the 
 joint in the link 2 frame, $\vec{a}$ is the axis of rotation as a unit vector in the 
-link 1 frame and $\vec{a}^\perp \in \R^{2 \times 3}$ is the orthgonal compliment to the 
+link 1 frame and $\vec{a}^\perp \in \R^{2 \times 3}$ is the orthgonal complement to the 
 joint axis. This is best computed by taking two consecutive cross products with the joint 
 axis. 
 
@@ -298,7 +298,7 @@ The total wrench on any link $j$ is then given by the following expression:
 \end{equation}
 
 \subsection{Discrete Dynamics} \label{sec:discrete_dynamics}
-The kinetic and potential energys of our multi-body system are:
+The kinetic and potential energies of our multi-body system are:
 \begin{equation}
     T(\mathbf{x},\mathbf{v}) = \sum_{j=1}^M \half (v^{(j)})^T M^{(j)} v^{(j)}
 \end{equation}
@@ -489,7 +489,7 @@ scratch in the Julia programming language. For maximal coordinates, automatic di
 was only used for the gradient 
 of the cost function: the Jacobian of all constraints were derived and implemented 
 analytically. For the minimal coordinate implementation, \texttt{RigidBodyDynamics.jl} was used to 
-compute the dynamics and dynamics Jacobians (using automatic differentiation) and the 
+compute the dynamics and dynamic Jacobians (using automatic differentiation) and the 
 dynamics were discretized using implicit 
 midpoint integration. All timing results were obtained on an Intel i7-1165G7 processor with
 16 GB of memory.
@@ -527,7 +527,7 @@ objective and constraint violations are shown in Figs. \ref{fig:acrobot_cost} an
 \ref{fig:acrobot_endeffector}. In summary, the maximal coordinate solver found a trajectory 
 with much lower control torques and therefore got a lower cost. As summarized in Table 
 \ref{tab:acrobot}, despite the fact the maximal coordinate trajetory problem is significantly
-larger, it's cost per iteration is almost half that of minimal coordinates in this 
+larger, its cost per iteration is almost half that of minimal coordinates in this 
 preliminary implementation. This is likely due to the fact that evaluating the dynamics Jacobian
 in maximal coordinates is extremely simple (not to mention extremely parallelizable) in 
 maximal coordinates, whereas minimal coordinates require inverting the mass matrix to solve 

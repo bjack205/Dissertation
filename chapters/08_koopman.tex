@@ -415,7 +415,7 @@ the rows of the matrices sequentially to build a QR decomposition of the full ma
 also tend to suffer from ill-conditioning 
 \cite{strobach_Recursive_1990,sayed_Recursive_2009,ghirnikar_Stable_1990}.
 
-To overcome these issues, we propose an alternative recursive method based. We solve
+To overcome these issues, we propose an alternative recursive method. We solve
 \eqref{opt:lls} by dividing up rows of $F$ into batches:
 \begin{align} \label{eq:F_sum}
   F^T F = F_1^T F_1 + F_2^T F_2 + \ldots + F_N^T F_N.
@@ -820,7 +820,7 @@ as shown in  Fig. \ref{fig:jdmd_full_quad_pointtopoint_with_waypoints}.}
 
 \subsection{Sensitivity to Model Mismatch}
 
-While we've introduced a significant mount of model mismatch in all of the examples so far,
+While we've introduced a significant amount of model mismatch in all of the examples so far,
 a natural argument against model-based methods is that they're only as good as your model is
 at capturing the salient dynamics of the system.  We investigated the effect of increasing
 model mismatch by incrementally increasing the Coulomb friction coefficient between the cart

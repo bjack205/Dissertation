@@ -54,7 +54,7 @@ scaling with respect to the horizon length, while ALTRO-C achieves
 significantly lower overall times. Both solvers exhibit polynomial scaling in
 the state and control dimensions, with ALTRO-C achieving better scaling with
 respect to state dimension. Because ALTRO-C directly optimizes control
-trajectories using a Ricatti recursion, it exhibits worse scaling with
+trajectories using a Riccati recursion, it exhibits worse scaling with
 respect to input dimension. While ALTRO-C is faster than OSQP for $m < 15$,
 OSQP has an advantage for systems with larger input dimensions.
 
@@ -133,7 +133,7 @@ of the flexible modes, and the control inputs, which were bounded between
 $\pm$\SI{0.1}{\N\m}. As shown in Fig. \ref{fig:flex_sat}, both solvers are
 able to leverage warm-starting to reduce the number of iterations required
 for convergence after a handful of MPC steps, with ALTRO-C being at least
-twice as fast as OSQP after the first few steps. %This result enables fast
+twice as fast as OSQP after the first few steps, enabling fast
 and reliable solving of the MPC problem, without any unnecessary overhead.
 
 \begin{figure}
@@ -164,7 +164,7 @@ that can readily be solved online.
     \label{fig:quad_cartoon}
 \end{figure}
 
-Based on \cite{carlo_Dynamic_2018}, we model the robot as a single rigid body with
+Based on \cite{carlo_Dynamic_2018}, we model the robot as a single rigid body 
 with $x_k \in \R^{12}$ and contact forces acting at the legs treated as
 control inputs $u_k \in \R^{12}$.
 A convex problem is obtained by linearizing the dynamics about the current
@@ -202,10 +202,10 @@ the common practice of linearizing friction cones to achieve faster MPC solve
 times may be unnecessary with better-optimized solvers.
 
 Finally, we note that non-convex versions of this problem have also been
-successfully demonstrated using the IPOPT solver
-\cite{bledt_Implementing_2019}. Because ALTRO is a general nonlinear solver,
-it can also seamlessly handle such non-convex extensions without having to
-change solvers, and while maintaining high performance.
+successfully demonstrated using the IPOPT solver \cite{bledt_Implementing_2019}.
+Because ALTRO is also a nonlinear trajectory optimization solver, it can also
+seamlessly handle such non-convex extensions without having to change solvers,
+and while maintaining high performance.
 
 \begin{figure}
     \centering

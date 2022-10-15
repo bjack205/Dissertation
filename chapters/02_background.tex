@@ -275,7 +275,7 @@ nonlinear optimization problem of the form \eqref{opt:discrete_trajopt}.
             g(x) &= 0 && \text{primal feasibility}\\
             h(x) &\leq 0 && \text{primal feasibility}\\
             \mu_i &\geq 0, \; i \in \mathbb{N}_p && \text{dual feasibility}\\
-            \mu_i h(x)_i &=0, \; i \in \mathbb{N}_p && \text{complimentarity}.
+            \mu_i h(x)_i &=0, \; i \in \mathbb{N}_p && \text{complementarity}.
         \end{align}
         \label{eq:nlp_kkt}
     \end{subequations}
@@ -337,7 +337,7 @@ nonlinear optimization problem of the form \eqref{opt:discrete_trajopt}.
     \end{equation}
     This is done to ensure that the dual feasibility condition is always
     satisfied, while allowing the update to decrease the value of $\mu_i$ to 0
-    (to satisfy the complimentarity condition) when the i-th constraint becomes
+    (to satisfy the complementarity condition) when the i-th constraint becomes
     satisfied.
 
 \subsection{Sequential Quadratic Programming}
@@ -345,7 +345,7 @@ nonlinear optimization problem of the form \eqref{opt:discrete_trajopt}.
     problems. Many variations exhist, but typically solve a quadratic program (QP) of the 
     following form:
     \begin{mini}[2]
-        {x}{\half x^T P x + q^T}{}{}
+        {x}{\half x^T P x + q^T x}{}{}
         \addConstraint{A x + b = 0}
         \addConstraint{C x + d \leq 0}
     \end{mini}
@@ -389,13 +389,13 @@ nonlinear optimization problem of the form \eqref{opt:discrete_trajopt}.
         \end{align}
     \end{subequations}
     The last equation can be written the more convenient matrix form:
-    \begin{equation} \label{eq:ipm_complimentarity}
+    \begin{equation} \label{eq:ipm_complementarity}
         \mu - \rho I(s)^{-1} e = 0
     \end{equation}
     where $I(x)$ is a diagonal matrix with the elements of the vector $x$ on the
     diagonal, and $e \in \R^p = [1, \dots 1]^T$ is the all ones vector. Comparing
     these with \eqref{eq:nlp_kkt} we see they are almost identical, with the exception
-    of the complimentarity condition, which is equal to the penalty parameter
+    of the complementarity condition, which is equal to the penalty parameter
     $\rho$ instead of zero. Thus, on each iteration of IPM, a relaxed version of
     the original KKT conditions is solved, achieving convergence to the true
     minima as $\rho \rightarrow 0$.
@@ -422,7 +422,7 @@ nonlinear optimization problem of the form \eqref{opt:discrete_trajopt}.
             h(x) + s \\
         \end{bmatrix}
     \end{equation}
-    where the second line is obtained by multiplying \eqref{eq:ipm_complimentarity} by $I(s)$.
+    where the second line is obtained by multiplying \eqref{eq:ipm_complementarity} by $I(s)$.
     This system can be converted into an equivalent symmetric system of equations by multiplying
     the second block row by $I(s)^{-1}$ and defining $\Sigma = I(s)^{-1} I(\mu)$:
     \begin{equation}

@@ -23,7 +23,7 @@ methods for solving linear systems are serial, and only a few commercial
 parallel direct methods exist.  We present a novel direct method that exploits
 the sparse, banded structure that arises in optimal control problems, including
 the prototypical LQR problem. Using a recursive application of Schur
-compliments, the algorithm has a theoretical $\mathcal{O}(\log(N))$ complexity
+complements, the algorithm has a theoretical $\mathcal{O}(\log(N))$ complexity
 in the time horizon, and maps well onto many-core processors. An open-source
 implementation demonstrates better performance than state-of-the-art commercial
 parallel direct solvers designed for general sparse symmetric linear systems.
@@ -85,7 +85,7 @@ for long-horizon trajectories.
 This paper presents a novel method for solving the LQR problem, whose solution can be found 
 by solving a banded linear system of equations. This linear system is prototypical of those 
 found when solving optimal control problems with methods like sequential quadratic
-programming (SQP). Using a hierarchical set of Schur compliments inspired by the
+programming (SQP). Using a hierarchical set of Schur complements inspired by the
 nested-dissection algorithm used to solve problems for planar graphs
 \cite{george_Nested_1973,khaira_Nested_}, we derive an algorithm with $\mathcal{O}(\log(N))$
 complexity in the time horizon. With a modest amount of parallelism, this algorithm
@@ -104,9 +104,9 @@ trajectories.
 The remainder of this paper is structured as
 follows: In Section \ref{sec:related_work} we survey methods for solving the LQR problem and
 other related parallel solvers for optimal control. In Section \ref{sec:background} we 
-review the linear quadratic regulator (LQR) problem and Schur compliments. We derive our 
+review the linear quadratic regulator (LQR) problem and Schur complements. We derive our 
 algorithm in Section \ref{sec:algorithm}, demonstrating a novel use of recursive
-Schur compliments to solve the LQR problem, followed by considerations for adapting the 
+Schur complements to solve the LQR problem, followed by considerations for adapting the 
 algorithm to work well on a many-core processor. The theoretical performance of the 
 algorithm is compared to the Riccati solution in Section \ref{sec:results_theory}, which is 
 followed up by a comparison of the actual open-source C implementation against
@@ -229,10 +229,10 @@ where for $N$ = 4:
 \noindent Note that $H$ is a symmetric, quasidefinite matrix (known as a KKT matrix) with $Nn + (N-1)m$ positive 
 eigenvalues and $Nn$ negative eigenvalues \cite{boyd_Convex_2004}.
 
-\subsection{Schur Compliments} \label{sec:schur_compliments}
-A Schur compliment is a common trick that reduces solving a single large linear system to solving a 
+\subsection{Schur complements} \label{sec:schur_complements}
+A Schur complement is a common trick that reduces solving a single large linear system to solving a 
 series of smaller ones. We will use the
-Schur compliment to solve symmetric 3x3 block-tridiagonal systems of the form: 
+Schur complement to solve symmetric 3x3 block-tridiagonal systems of the form: 
 \begin{equation} \label{eq:schur_3x3}
     \begin{bmatrix}
         A   & D & \\
@@ -256,8 +256,8 @@ We can solve the first and last rows of \eqref{eq:schur_3x3} for $x$ and $z$:
 where we calculate the following pieces numerically by factorizing $A$ and $C$:
 \begin{subequations} \label{eq:schur_temps}
 \begin{align}
-    &\bar{D} = A^{-1} E, \quad \bar{a} = A^{-1} a, \\
-    &\bar{E} = C^{-1} D, \quad \bar{c} = C^{-1} c.
+    &\bar{D} = A^{-1} D, \quad \bar{a} = A^{-1} a, \\
+    &\bar{E} = C^{-1} E, \quad \bar{c} = C^{-1} c.
 \end{align}
 \end{subequations}
 We can use \eqref{eq:schur_xz} to eliminate $x$ and $z$ from the middle row, allowing us to 
@@ -324,7 +324,7 @@ After solving \eqref{eq:schur_y} numerically, we can now plug the result into
         partitioned, with the top blue blocks equating to $x$ and $a$, the middle green 
         block to $y$ and $b$, and the bottom blue blocks to $z$ and $c$. 
         We use these blocks to solve the LQR problem using the steps
-        in Sec. \ref{sec:schur_compliments}.
+        in Sec. \ref{sec:schur_complements}.
     }
     \label{fig:kkt_schur}
 \end{figure}
@@ -333,7 +333,7 @@ After solving \eqref{eq:schur_y} numerically, we can now plug the result into
 
 \section{A Parallel LQR Algorithm} \label{sec:algorithm}
 
-\subsection{Recursive Schur Compliments}
+\subsection{Recursive Schur complements}
 We now derive our parallelizable algorithm for solving linear systems of the form 
 \eqref{eq:linear_system}. First, we reorder the rows and columns of \eqref{eq:qp_KKT}
 to get a banded matrix with a bandwidth of $2n + m -1$ (see Fig. \ref{fig:kkt_schur}).
@@ -621,7 +621,7 @@ block-diagonal matrices, we can solve all of these systems directly using e.g. a
 Cholesky decomposition.  With these pieces we use \eqref{eq:schur_y} to get all the $y$'s,
 followed by \eqref{eq:schur_xz} to get all the $x$'s and $z$'s, which concatentated form the
 $\bar{a}$, $\bar{c}$, $\bar{D}$, and $\bar{E}$ at the next level, i.e. \eqref{eq:level_1}.
-These are then used to solve the top-level Schur compliment for the solution vector using
+These are then used to solve the top-level Schur complement for the solution vector using
 the same procedure.
 
 \newcommand{\SP}{\makebox[1em]{}}
@@ -681,7 +681,7 @@ the same procedure.
         \end{bNiceMatrix}
         $}
     \end{equation*}
-    \caption{The LQR KKT system after recursively partitioning with Schur compliments with a 
+    \caption{The LQR KKT system after recursively partitioning with Schur complements with a 
         depth of $K=2 = \log_2(N)$ with $N=4$. The labels follow the notation used in
         Algorithm \ref{alg:recursive_schur}. Levels are enumerated starting at $j=1$ for the
         deepest recursion level (the orange and red blocks), up to $j=K$ (the green blocks).
@@ -700,8 +700,8 @@ the same procedure.
     \label{fig:kkt_partitioned}
 \end{figure}
 It should be clear that the resulting algorithm is naturally recursive and results in a
-binary tree of Schur compliments, since each 3x3 Schur compliment requires solving another
-Schur compliment problem for both $A$ and $C$. Borrowing terminology from tree graphs, 
+binary tree of Schur complements, since each 3x3 Schur complement requires solving another
+Schur complement problem for both $A$ and $C$. Borrowing terminology from tree graphs, 
 we will often refer to e.g. $D_i^{(j)}$ as the $D$ for the $i$th ``leaf'' of ``level'' $j$.
 While a na\"ive recursive implementation of
 this algorithm turns out to be computationally inefficient and hard to parallelize, we can
@@ -726,7 +726,7 @@ modifications that are needed to efficiently implement the algorithm on a many-c
 processor. 
 
 \begin{algorithm}
-    \caption{Recursive Schur Compliments}
+    \caption{Recursive Schur complements}
     \begin{algorithmic}[1]
         \For {$i \in (0,2^{K-1}]$}
             \For {$p \in (0,K+1]$}
@@ -821,7 +821,7 @@ Since our updates are of the form:
 \end{subequations}
 each row can be updated in parallel. We perform these updates blockwise, parallelizing over
 knot points and upper levels. We can write down a function
-\mbox{\textproc{UpateSchur}($k,j,p$)} that performs \eqref{eq:update_xy} based on the knot
+\mbox{\textproc{UpdateSchur}($k,j,p$)} that performs \eqref{eq:update_xy} based on the knot
 point index $k$, level $j$, and upper level $p$.
 
 \begin{algorithm}
@@ -909,7 +909,7 @@ with $n=14$ and $m=7$.
         % \bottomrule
     \end{tabular}
     \caption*{\small{For matrix multiplication $C = A B$, $A \in \R^{n \times m}$, $B \in \R^{m \times p}$. 
-        For cholesky factorization, $A \in \R^{n \times n}$, and for a Cholesky solve $A x = b$, 
+        For Cholesky factorization, $A \in \R^{n \times n}$, and for a Cholesky solve $A x = b$, 
         $b \in \R^{n \times p}$.}}
     \label{tab:linalg_complexity}
 \end{table}
@@ -977,7 +977,7 @@ than parallelized commercial solvers for symmetric sparse systems, with a 183\% 
 over Pardiso 6.0 \cite{schenk_PARDISO_2011} and an 84\% improvement over MA86
 \cite{hogg_Indefinite_2010} at a horizon length of $N = 512$.  In our tests, neither of these
 solvers scaled very well with increased parallelism, often only providing marginal
-improvements. Our algorithm demonstrated performance on-par with with the SuiteSparse
+improvements. Our algorithm demonstrated performance on-par with the SuiteSparse
 package, and was only beat by the single-threaded QDLDL algorithm \cite{stellato_OSQP_2020},
 whose performance on these KKT systems is significantly better than all other solvers.
 
